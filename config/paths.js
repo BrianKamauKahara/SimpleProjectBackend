@@ -10,6 +10,8 @@ const paths = {
     models: path.resolve(__dirname, '..', 'models'),
     controllers: path.resolve(__dirname, '..', 'controllers'),
     services: path.resolve(__dirname, '..', 'services'),
+    serviceKey: path.resolve(__dirname, '..', 'serviceAccountKey.json'),
+    resources: path.resolve(__dirname, '..', 'resources'),
     subPaths (mainDir, ...pathList) {
          return path.resolve(this[mainDir],  ...pathList) 
     }

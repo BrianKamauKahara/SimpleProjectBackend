@@ -1,18 +1,18 @@
 const express = require('express')
-const router = express.router()
+const router = express.Router()
 
 const { pathFor } = require('../config/paths')
 const { 
     getAllNotes,
     getNote,
-    createNote,
+    addNote,
     updateNote,
     deleteNote
 } = require(pathFor('controllers', 'notesController'))
 
 router.route('/')
     .get(getAllNotes)
-    .post(createNote)
+    .post(addNote)
 
 router.route('/:id')
     .get(getNote)

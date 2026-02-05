@@ -4,8 +4,7 @@ const fs = require('fs')
 const fsPromises = require('fs').promises
 
 
-const paths = require('../config/paths')
-
+const { paths } = require('../config/paths')
 
 const getLogMessage = (message) => `${format(new Date(), 'yyyyMMdd\tHH:mm:ss')}\t${uuid()}\t${message}`
 
@@ -24,9 +23,12 @@ const logEvents = async (message, fileName) => {
 }
 
 const logger = (req, res, next) => {
-    logEvents(`${req.method}\t${req.headers.origin}\t${req.url}`, 'requestsLogs.Log')
-    console.log(`${req.method}\t${req.path}`)
-    next()
+    const origin = req.headers.origin ?? 'no-origin'
+    const path = req.originalUrl ?? req.url ?? 'unknown-path'
+     
+    logEvents(`${req.method}\t${origin}\t${path}\n`, 'requestLogs.log')
+    console.log(`${req.method}\t${path}`)
+    next()  
 }
 
 module.exports = { logger, logEvents }
