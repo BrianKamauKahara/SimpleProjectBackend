@@ -4,7 +4,7 @@ const PORT = process.env.PORT
 
 // // ---- IMPORTS
 const express = require('express')
-const { paths, pathFor } = require('./config/paths')
+const { paths, pathFor } = require('../config/paths')
 
 
 // // ---- APP
@@ -46,6 +46,4 @@ const connectDB = async () => {
     }
 }
 
-connectDB().then(() => {
-    app.listen(PORT, () => console.log(`Server listening on port ${PORT}`))
-})
+connectDB()
