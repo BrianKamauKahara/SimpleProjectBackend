@@ -25,7 +25,7 @@ app.use('/', require(pathFor('routes', 'notesRoutes')))
 
 
 // // ---- ERROR HANDLING
-const errorHandler = require(pathFor('middleware', 'errorLogger.js'))
+const errorHandler = require(pathFor('middleware', 'ErrorLogger'))
 app.use(errorHandler)
 
 app.all(/^\/.*/, (req, res) => {
