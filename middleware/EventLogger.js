@@ -1,12 +1,12 @@
 const { format } = require('date-fns')
-const { v4: uuid } = require('uuid')
+const { nanoid } = require('nanoid')
 const fs = require('fs')
 const fsPromises = require('fs').promises
 
 
 const { paths } = require('../config/paths')
 
-const getLogMessage = (message) => `${format(new Date(), 'yyyyMMdd\tHH:mm:ss')}\t${uuid()}\t${message}`
+const getLogMessage = (message) => `${format(new Date(), 'yyyyMMdd\tHH:mm:ss')}\t${nanoid()}\t${message}`
 
 const logEvents = async (message, fileName) => {
     const logItem = getLogMessage(message)
