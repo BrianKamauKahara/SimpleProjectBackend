@@ -14,8 +14,10 @@ const db = require(pathFor('resources', 'database'))
 
 // // ---- MIDDLEWARE
 const { logger, logEvents } = require(pathFor('middleware', 'EventLogger'))
-app.use(logger)
+const connectDB = require(pathFor('middleware', 'dbConn'))
 app.use(express.json())
+app.use(logger)
+app.use(connectDB)
 
 // // ---- ROUTES
 app.use('/', require(pathFor('routes', 'notesRoutes')))
@@ -35,15 +37,6 @@ app.all(/^\/.*/, (req, res) => {
     }
 })
 
-// // ---- CONNECT TO DATABASE AND START APPLICATION
-const connectDB = async () => {
-    try {
-        await db.collection('notes').limit(1).get()
-        console.log('Firestore Initialized')
-    } catch (err) {
-        console.error('Firestore Initialization Error: ', err)
-        process.exit(1)
-    }
-}
 
-connectDB()
+// // ---- FOR DEAR VERCEL
+module.exports = app
