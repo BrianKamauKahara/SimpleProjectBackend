@@ -21,7 +21,7 @@ app.use(logger)
 app.use(connectDB)
 
 // // ---- ROUTES
-app.use('/', require(pathFor('routes', 'notesRoutes')))
+app.use('/notes', require(pathFor('routes', 'notesRoutes')))
 
 
 // // ---- ERROR HANDLING
