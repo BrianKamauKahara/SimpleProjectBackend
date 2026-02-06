@@ -4,7 +4,7 @@ const PORT = process.env.PORT
 
 // // ---- IMPORTS
 const express = require('express')
-const { paths, pathFor } = require('../config/paths')
+const { paths, pathFor } = require('./config/paths')
 
 
 // // ---- APP
