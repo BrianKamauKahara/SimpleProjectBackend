@@ -1,3 +1,6 @@
+const {pathFor} = require('../config/paths')
+const db = require(pathFor('resources', 'database'))
+
 // // ---- CONNECT TO DATABASE
 let firestoreReady = false
 const connect = async () => {
