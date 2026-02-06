@@ -15,6 +15,7 @@ const db = require(pathFor('resources', 'database'))
 // // ---- MIDDLEWARE
 const { logger, logEvents } = require(pathFor('middleware', 'EventLogger'))
 const connectDB = require(pathFor('middleware', 'dbConn'))
+app.use(express.static(paths.static))
 app.use(express.json())
 app.use(logger)
 app.use(connectDB)
