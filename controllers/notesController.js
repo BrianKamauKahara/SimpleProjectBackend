@@ -7,32 +7,40 @@ const {
     dbUpdateNote,
     dbDeleteNote
 } = require(pathFor('services', 'noteServices'))
-
+const errorLogger = require(pathFor('middleware', 'ErrorLogger'))
 // // --------UTIL
 const errorCodes = {
-  'not-found': 404,
-  5: 404, // gRPC fallback
-  'already-exists': 409,
-  6: 409,
-  'permission-denied': 403,
-  7: 403,
-  'unavailable': 500,
-  14: 500,
-  'bad-request' : 400
+    'not-found': 404,
+    5: 404, // gRPC fallback
+    'already-exists': 409,
+    6: 409,
+    'permission-denied': 403,
+    7: 403,
+    'unavailable': 500,
+    14: 500,
+    'bad-request': 400
 }
 
 
-const configureResult = (result, expectedSuccessCode, {expectedDataMap = null, expectedErrorMap = null} = {}) => {
+const configureResult = (req, result, expectedSuccessCode, { expectedDataMap = null, expectedErrorMap = null } = {}) => {
     if (result.success) {
-    return expectedDataMap 
-      ? expectedDataMap(result) 
-      : { status: expectedSuccessCode, data: result.data };
-  } else {
-    /* console.log(result.error) */
-    return expectedErrorMap 
-      ? expectedErrorMap(result) 
-      : { status: errorCodes[result.error.code] ?? 500, data: result.error };
-  }
+        return expectedDataMap
+            ? expectedDataMap(result)
+            : { status: expectedSuccessCode, data: result.data };
+    } else {
+        errorLogger(result.error, req) // Not Perfect, Further improvement needed
+        console.log(result)
+        return expectedErrorMap
+            ? expectedErrorMap(result)
+            : {
+                status: errorCodes[result.error.code] ?? 500,
+                data: {
+                    message: result.error.message,
+                    code: result.error.code,
+                    stack: process.env.NODE_ENV === 'development' ? result.error.stack : undefined
+                }
+            }
+    }
 }
 
 // // --------FUNC
@@ -41,7 +49,14 @@ const configureResult = (result, expectedSuccessCode, {expectedDataMap = null, e
 // @route GET /
 // @access Private
 const getAllNotes = asyncHandler(async (req, res) => {
-    const result = configureResult(await dbGetAllNotes(), 200)
+    const { startDocId, limit, asc } = req.query
+    const result = configureResult(req, await dbGetAllNotes(
+        {
+            startDocId: startDocId || null,
+            limit: parseInt(limit) || 2,
+            asc: asc === 'true'
+        }),
+        200)
 
     return res.status(result.status).json(result.data)
 })
@@ -52,7 +67,7 @@ const getAllNotes = asyncHandler(async (req, res) => {
 const addNote = asyncHandler(async (req, res) => {
     const { title, content } = req.body
 
-    const result = configureResult(await dbCreateAndStoreNote(title, content), 201)
+    const result = configureResult(req, await dbCreateAndStoreNote(title, content), 201)
 
     return res.status(result.status).json(result.data)
 })
@@ -63,7 +78,7 @@ const addNote = asyncHandler(async (req, res) => {
 const getNote = asyncHandler(async (req, res) => {
     const id = req.params.id
 
-    const result = configureResult(await dbGetNote(id), 200)
+    const result = configureResult(req, await dbGetNote(id), 200)
 
     return res.status(result.status).json(result.data)
 })
@@ -75,7 +90,7 @@ const updateNote = asyncHandler(async (req, res) => {
     const id = req.params.id
     const { title, content } = req.body
 
-    const result = configureResult(await dbUpdateNote(id, {title, content}), 200)
+    const result = configureResult(req, await dbUpdateNote(id, { title, content }), 200)
 
     return res.status(result.status).json(result.data)
 })
@@ -87,7 +102,7 @@ const updateNote = asyncHandler(async (req, res) => {
 const deleteNote = asyncHandler(async (req, res) => {
     const id = req.params.id
 
-    const result = configureResult(await dbDeleteNote(id), 200)
+    const result = configureResult(req, await dbDeleteNote(id), 200)
 
     return res.status(result.status).json(result.data)
 })

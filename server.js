@@ -1,5 +1,5 @@
 // // ---- ENV VARIABLES
-require('dotenv').config({ quiet:true })
+require('dotenv').config({ quiet: true })
 const PORT = process.env.PORT
 
 // // ---- IMPORTS
@@ -25,19 +25,28 @@ app.use('/notes', require(pathFor('routes', 'notesRoutes')))
 
 
 // // ---- ERROR HANDLING
-const errorHandler = require(pathFor('middleware', 'ErrorLogger'))
-app.use(errorHandler)
+const errorLogger = require(pathFor('middleware', 'ErrorLogger'))
+app.use(errorLogger)
 
 app.all(/^\/.*/, (req, res) => {
     res.status(404)
 
     if (req.accepts('json')) {
-        res.json({ error: "404 Not Found" });
+        res.json({ error: "Invalid Request" });
     } else {
         res.type('txt').send("404 Not Found");
     }
 })
 
 
+// // ---- FOR DEVELOPMENT
+const env = process.env.NODE_ENV || null;
+
+if (env === "development") {
+    app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+}
+
+
 // // ---- FOR DEAR VERCEL
 module.exports = app
+

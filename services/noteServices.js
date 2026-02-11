@@ -2,14 +2,6 @@ const { pathFor } = require('../config/paths')
 const Note = require(pathFor('models', 'Note'))
 
 // // --------UTIL
-const foundNoteProcessor = (doc) => {
-    if (doc != null) {
-        return { success: true, data: doc }
-    } else {
-        return { success: false, error: { code: 'not-found', message: 'Document does not exist' } }
-    }
-}
-
 const wrapAsync = async (promise, { onSuccess = undefined, onError = undefined } = {}) => {
     try {
         const result = await promise
@@ -21,9 +13,9 @@ const wrapAsync = async (promise, { onSuccess = undefined, onError = undefined }
 }
 
 // // --------FUNC
-const dbGetAllNotes = async () => await wrapAsync(Note.findAll())
+const dbGetAllNotes = async ({ startDocId, limit, asc } = {}) => await wrapAsync(Note.findAll({ startDocId, limit, asc }))
 
-const dbGetNote = async (id) => await wrapAsync(Note.findById(id), { onSuccess: foundNoteProcessor })
+const dbGetNote = async (id) => await wrapAsync(Note.findById(id))
 
 const dbCreateAndStoreNote = async (title, content) => await wrapAsync(Note.create({ title, content }))
 

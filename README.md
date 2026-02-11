@@ -136,15 +136,14 @@ npx run dev
 ```
 
 
-## API Endpoints
+| Method | Route      | Description                 | Body / Params                                                                                |
+| ------ | ---------- | --------------------------- | -------------------------------------------------------------------------------------------- |
+| GET    | /notes     | Fetch notes with pagination | Query params: `startDocId` (optional), `limit` (optional), `asc` (optional, default `false`) |
+| POST   | /notes     | Create a new note           | `{ title, content }`                                                                         |
+| GET    | /notes/:id | Get a note by ID            | `id`                                                                                         |
+| PUT    | /notes/:id | Update note by ID           | `id` + body                                                                                  |
+| DELETE | /notes/:id | Delete note by ID           | `id`                                                                                         |
 
-| Method | Route        | Description         | Body / Params       |
-|--------|-------------|-------------------|------------------|
-| GET    | /notes      | Fetch all notes    | None             |
-| POST   | /notes      | Create a new note  | { title, content } |
-| GET    | /notes/:id  | Get a note by ID   | id               |
-| PUT    | /notes/:id  | Update note by ID  | id + body        |
-| DELETE | /notes/:id  | Delete note by ID  | id               |
 
 
 ## Middleware

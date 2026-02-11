@@ -2,6 +2,15 @@ const admin = require('firebase-admin')
 const { pathFor } = require('../config/paths')
 const db = require(pathFor('resources', 'database'))
 
+class DocumentNotFoundError extends Error {
+    constructor(message) {
+        super(message)
+        this.name = 'DocumentNotFoundError'
+        this.code = 'not-found'
+        Error.captureStackTrace(this, this.constructor)
+    }
+}
+
 class BaseModel {
     static collection() {
         throw new Error('collection() not implemented')
@@ -19,9 +28,20 @@ class BaseModel {
         return { id: d.id, ...d.data() }
     }
 
-    static async findAll() {
-        const snap = await this.ref().get()
+    static async findAll({ startDocId, limit = 10, asc = false } = {}) {
+        let query = this.ref().orderBy('createdAt', asc ? 'asc' : 'desc').limit(limit)
 
+        if (startDocId) {
+            const startDocSnap = await this.ref().doc(startDocId).get()
+            if (!startDocSnap.exists) {
+                throw new DocumentNotFoundError(
+                    `Document with id ${startDocId} does not exist`
+                )
+            }
+            query = query.startAfter(startDocSnap)
+        }
+
+        const snap = await query.get()
         return snap.docs.map(d => this.format(d))
     }
 
@@ -42,7 +62,12 @@ class BaseModel {
 
     static async findById(id) {
         const doc = await this.ref().doc(id).get()
-        return doc.exists ? this.format(doc) : null
+        if (!doc.exists) {
+            throw new DocumentNotFoundError(
+                `Document with id ${id} does not exist`
+            )
+        }
+        return this.format(doc)
     }
 
     static async updateById(id, data) {
@@ -51,7 +76,7 @@ class BaseModel {
             await this.validate(data, { all: false })
         }
 
-        await this.ref().doc(id).update({...data, updatedAt: admin.firestore.FieldValue.serverTimestamp()})
+        await this.ref().doc(id).update({ ...data, updatedAt: admin.firestore.FieldValue.serverTimestamp() })
         return this.findById(id)
     }
 
@@ -60,7 +85,9 @@ class BaseModel {
         const doc = await docRef.get()
 
         if (!doc.exists) {
-            throw { code: 'not-found', message: `Document with id ${id} does not exist` }
+            throw new DocumentNotFoundError(
+                `Document with id ${id} does not exist`
+            )
         }
 
         await docRef.delete()
