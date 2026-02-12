@@ -1,4 +1,5 @@
 const BaseModel = require('./BaseModel')
+const { BadRequestError, ValidationError } = require('./Errors')
 
 class Note extends BaseModel {
     static collection() {
@@ -12,19 +13,19 @@ class Note extends BaseModel {
         } else {
             if (title !== undefined) this.validateTitle(title)
             else if (content !== undefined) this.validateContent(content)
-            else throw { code: 'bad-request', message: 'Nothing to update'}
+            else throw new BadRequestError('Nothing to Update')
         }
     }
 
     static validateTitle(title) {
         if (!title || typeof title !== 'string') {
-            throw { code: 'bad-request', message: `Title must be a non-empty string` }
+            throw new ValidationError('Title must be a non-empty string')
         }
     }
 
     static validateContent(content) {
         if (!content || typeof content !== 'string') {
-            throw { code: 'bad-request', message: `Content must be a non-empty string` }
+            throw new ValidationError('Content must be a non-empty string')
         }
     }
 }

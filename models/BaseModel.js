@@ -1,15 +1,8 @@
 const admin = require('firebase-admin')
+
+const { DocumentNotFoundError } = require('./Errors')
 const { pathFor } = require('../config/paths')
 const db = require(pathFor('resources', 'database'))
-
-class DocumentNotFoundError extends Error {
-    constructor(message) {
-        super(message)
-        this.name = 'DocumentNotFoundError'
-        this.code = 'not-found'
-        Error.captureStackTrace(this, this.constructor)
-    }
-}
 
 class BaseModel {
     static collection() {
@@ -20,8 +13,15 @@ class BaseModel {
         return db.collection(this.collection())
     }
 
-    getDoc(id) {
-        return this.constructor.ref().doc(id)
+    static async getDocOrThrow(id) {
+        const doc = await this.ref().doc(id).get()
+
+        if (!doc.exists) {
+            throw new DocumentNotFoundError(
+                `Document with id ${id} does not exist`
+            )
+        }
+        return doc
     }
 
     static format(d) {
@@ -29,15 +29,12 @@ class BaseModel {
     }
 
     static async findAll({ startDocId, limit = 10, asc = false } = {}) {
-        let query = this.ref().orderBy('createdAt', asc ? 'asc' : 'desc').limit(limit)
+        let query = this.ref()
+            .orderBy('createdAt', asc ? 'asc' : 'desc')
+            .limit(limit)
 
         if (startDocId) {
-            const startDocSnap = await this.ref().doc(startDocId).get()
-            if (!startDocSnap.exists) {
-                throw new DocumentNotFoundError(
-                    `Document with id ${startDocId} does not exist`
-                )
-            }
+            const startDocSnap = await this.getDocOrThrow(id)
             query = query.startAfter(startDocSnap)
         }
 
@@ -61,12 +58,8 @@ class BaseModel {
     }
 
     static async findById(id) {
-        const doc = await this.ref().doc(id).get()
-        if (!doc.exists) {
-            throw new DocumentNotFoundError(
-                `Document with id ${id} does not exist`
-            )
-        }
+        const doc = await this.getDocOrThrow(id)
+
         return this.format(doc)
     }
 
@@ -76,21 +69,21 @@ class BaseModel {
             await this.validate(data, { all: false })
         }
 
-        await this.ref().doc(id).update({ ...data, updatedAt: admin.firestore.FieldValue.serverTimestamp() })
+        const doc = await this.getDocOrThrow(id)
+
+        await doc.ref.update({
+            ...data,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        })
+
         return this.findById(id)
     }
 
     static async deleteById(id) {
-        const docRef = this.ref().doc(id)
-        const doc = await docRef.get()
+        const doc = await this.getDocOrThrow(id)
 
-        if (!doc.exists) {
-            throw new DocumentNotFoundError(
-                `Document with id ${id} does not exist`
-            )
-        }
+        await doc.ref.delete()
 
-        await docRef.delete()
         return { ack: 'data deleted successfully' }
     }
 }

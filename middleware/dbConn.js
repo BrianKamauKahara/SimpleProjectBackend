@@ -20,8 +20,8 @@ const connectDB = async (req, res, next) => {
   try {
     await connect()
     next()
-  } catch {
-    res.status(503).json({ error: 'Database unavailable' })
+  } catch (err) {
+    next(err)
   }
 }
 

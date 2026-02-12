@@ -2,3 +2,13 @@
 20260211	14:27:29	ewbmrC9kMLe6cAgILN9f	undefined:	 Document with id EZ4bVctn8sOa3e8HpSg does not exist	GET	undefined	/EZ4bVctn8sOa3e8HpSg
 20260211	14:28:28	VF1pNViONRrl0NgeDfpf	undefined:	 Document with id EZ4bVctn8sOa3e8HpSg does not exist	GET	undefined	/EZ4bVctn8sOa3e8HpSg
 20260211	14:33:48	RFaTG3lOS8SB5mAkED33	DocumentNotFoundError:	 Document with id EZ4bVctn8sOa3e8HpSg does not exist	GET	undefined	/EZ4bVctn8sOa3e8HpSg
+20260211	15:21:48	1PkIKQp7szUEnPdaANUL	DocumentNotFoundError:	 Document with id EZ4bVctn8sOa3e8HpSg does not exist	GET	undefined	/EZ4bVctn8sOa3e8HpSg
+20260211	15:38:31	yy8uNo52X9fqw6x8eyHO	Error:	 9 FAILED_PRECONDITION: The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/notes-simproj-04022026/firestore/indexes?create_composite=ClRwcm9qZWN0cy9ub3Rlcy1zaW1wcm9qLTA0MDIyMDI2L2RhdGFiYXNlcy8oZGVmYXVsdCkvY29sbGVjdGlvbkdyb3Vwcy9ub3Rlcy9pbmRleGVzL18QARoNCgljcmVhdGVkQXQQAhoMCghfX25hbWVfXxAB	GET	undefined	/
+20260212	09:05:13	bwZNCLizRCZ0KzcStTQw	TypeError:	 Invalid status code: undefined. Status code must be an integer.	GET	undefined	/notes
+20260212	09:05:41	ZXbAr04ynG2tB3SZ2HY0	TypeError:	 Invalid status code: undefined. Status code must be an integer.	GET	undefined	/notes
+20260212	09:06:22	RQjplgicP0dAvO5PIaAB	TypeError:	 Invalid status code: undefined. Status code must be an integer.	GET	undefined	/notes
+20260212	09:07:44	vBMfv6lB1BrEzTMwCkkY	TypeError:	 Invalid status code: undefined. Status code must be an integer.	GET	undefined	/notes
+20260212	09:08:15	h62nSEA3OVq1k1qBIXPd	TypeError:	 Invalid status code: undefined. Status code must be an integer.	GET	undefined	/notes
+20260212	09:09:12	J9frZnNhOKNRAIPbvDLB	TypeError:	 Invalid status code: undefined. Status code must be an integer.	GET	undefined	/notes
+20260212	09:09:43	MTjH5oBdAETP69Jb3hnq	TypeError:	 Invalid status code: undefined. Status code must be an integer.	GET	undefined	/notes
+20260212	09:15:53	DH49fdh6W9Dv7hC1qktx	TypeError:	 DocumentNotFoundError is not a constructor	PATCH	undefined	/notes/EZ4bVctn8sOa3Ief8HpSg

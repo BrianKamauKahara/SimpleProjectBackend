@@ -7,7 +7,8 @@ const {
     dbUpdateNote,
     dbDeleteNote
 } = require(pathFor('services', 'noteServices'))
-const errorLogger = require(pathFor('middleware', 'ErrorLogger'))
+
+
 // // --------UTIL
 const errorCodes = {
     'not-found': 404,
@@ -22,24 +23,25 @@ const errorCodes = {
 }
 
 
-const configureResult = (req, result, expectedSuccessCode, { expectedDataMap = null, expectedErrorMap = null } = {}) => {
-    if (result.success) {
-        return expectedDataMap
-            ? expectedDataMap(result)
-            : { status: expectedSuccessCode, data: result.data };
-    } else {
-        errorLogger(result.error, req) // Not Perfect, Further improvement needed
-        console.log(result)
-        return expectedErrorMap
-            ? expectedErrorMap(result)
-            : {
-                status: errorCodes[result.error.code] ?? 500,
-                data: {
-                    message: result.error.message,
-                    code: result.error.code,
-                    stack: process.env.NODE_ENV === 'development' ? result.error.stack : undefined
-                }
+const resultHandler = async (promise, successCode = 200) => {
+    try {
+        const result = await promise
+
+        return {
+            statusCode: successCode,
+            data: result
+        }
+    } catch (err) {
+        if (!err.isOperational) throw err
+
+        console.log(err)
+        return {
+            statusCode: err.statusCode || errorCodes[err.code],
+            data: {
+                message: err.message,
+                stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
             }
+        }
     }
 }
 
@@ -49,16 +51,17 @@ const configureResult = (req, result, expectedSuccessCode, { expectedDataMap = n
 // @route GET /
 // @access Private
 const getAllNotes = asyncHandler(async (req, res) => {
-    const { startDocId, limit, asc } = req.query
-    const result = configureResult(req, await dbGetAllNotes(
+    const { startDocId, limit, asc, exclude } = req.query
+
+    const result = await resultHandler(dbGetAllNotes(
         {
             startDocId: startDocId || null,
             limit: parseInt(limit) || 2,
-            asc: asc === 'true'
-        }),
-        200)
+            asc: asc === 'true',
+            exclude: exclude === 'true'
+        }))
 
-    return res.status(result.status).json(result.data)
+    return res.status(result.statusCode).json(result.data)
 })
 
 // @desc Add new note
@@ -67,9 +70,9 @@ const getAllNotes = asyncHandler(async (req, res) => {
 const addNote = asyncHandler(async (req, res) => {
     const { title, content } = req.body
 
-    const result = configureResult(req, await dbCreateAndStoreNote(title, content), 201)
+    const result = await resultHandler(dbCreateAndStoreNote(title, content), 201)
 
-    return res.status(result.status).json(result.data)
+    return res.status(result.statusCode).json(result.data)
 })
 
 // @desc Get specified note
@@ -78,9 +81,9 @@ const addNote = asyncHandler(async (req, res) => {
 const getNote = asyncHandler(async (req, res) => {
     const id = req.params.id
 
-    const result = configureResult(req, await dbGetNote(id), 200)
+    const result = await resultHandler(dbGetNote(id))
 
-    return res.status(result.status).json(result.data)
+    return res.status(result.statusCode).json(result.data)
 })
 
 // @desc Update specified note
@@ -90,9 +93,9 @@ const updateNote = asyncHandler(async (req, res) => {
     const id = req.params.id
     const { title, content } = req.body
 
-    const result = configureResult(req, await dbUpdateNote(id, { title, content }), 200)
+    const result = await resultHandler(dbUpdateNote(id, { title, content }))
 
-    return res.status(result.status).json(result.data)
+    return res.status(result.statusCode).json(result.data)
 })
 
 
@@ -102,9 +105,9 @@ const updateNote = asyncHandler(async (req, res) => {
 const deleteNote = asyncHandler(async (req, res) => {
     const id = req.params.id
 
-    const result = configureResult(req, await dbDeleteNote(id), 200)
+    const result = await resultHandler(dbDeleteNote(id))
 
-    return res.status(result.status).json(result.data)
+    return res.status(result.statusCode).json(result.data)
 })
 
 module.exports = {

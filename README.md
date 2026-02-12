@@ -1,7 +1,8 @@
-# Simple Notes Backed Project
+# Simple Notes Backe.d Project
 
 This is a small project intended to re-learn how to set up and deploy a simple backend that stores notes.
 
+This project also serves as a base for easy setup of other backend projects
 ---
 
 ## Table of Contents
@@ -114,7 +115,7 @@ You will only need your own firebase credentials as the environment variable.
 To accomplish this, follow the steps below:
 1. Go to the [firebase website](https://firebase.google.com/products/firestore) and create your own firestore project
 2. Download your credentials JSON file
-3. Stringify the credential file using JSON.stringify and store the result in the .env
+3. Stringify the credential file using JSON.stringify and store the result in the .env. Note that do not store the stringified credentials with the string quotes, i.e remove the string quotes. I'll make this easier in the future
 
 ```bash
 FIREBASE_CRED=<parsed_json_credential>
@@ -131,14 +132,14 @@ This is how you will run the project locally
 npm start
 
 # Or with hot reload
-npx run dev
+npm run dev
 
 ```
 
 
 | Method | Route      | Description                 | Body / Params                                                                                |
 | ------ | ---------- | --------------------------- | -------------------------------------------------------------------------------------------- |
-| GET    | /notes     | Fetch notes with pagination | Query params: `startDocId` (optional), `limit` (optional), `asc` (optional, default `false`) |
+| GET    | /notes     | Fetch notes in a batch | Query params: `startDocId` (optional), `limit` (optional, default 2), `asc` (optional, default `false`) |
 | POST   | /notes     | Create a new note           | `{ title, content }`                                                                         |
 | GET    | /notes/:id | Get a note by ID            | `id`                                                                                         |
 | PUT    | /notes/:id | Update note by ID           | `id` + body                                                                                  |
