@@ -12,3 +12,4 @@
 20260212	09:09:12	J9frZnNhOKNRAIPbvDLB	TypeError:	 Invalid status code: undefined. Status code must be an integer.	GET	undefined	/notes
 20260212	09:09:43	MTjH5oBdAETP69Jb3hnq	TypeError:	 Invalid status code: undefined. Status code must be an integer.	GET	undefined	/notes
 20260212	09:15:53	DH49fdh6W9Dv7hC1qktx	TypeError:	 DocumentNotFoundError is not a constructor	PATCH	undefined	/notes/EZ4bVctn8sOa3Ief8HpSg
+20260212	09:52:23	Nf0xEFF8Kj9gpa2TpxPx	Error:	 Update() requires either a single JavaScript object or an alternating list of field/value pairs that can be followed by an optional precondition. Value for argument "dataOrField" is not a valid Firestore value. Cannot use "undefined" as a Firestore value (found in field "content"). If you want to ignore undefined values, enable `ignoreUndefinedProperties`.	PATCH	undefined	/notes/njvlsNtjeTaxKmJIyoEN

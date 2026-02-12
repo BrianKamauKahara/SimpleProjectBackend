@@ -51,14 +51,13 @@ const resultHandler = async (promise, successCode = 200) => {
 // @route GET /
 // @access Private
 const getAllNotes = asyncHandler(async (req, res) => {
-    const { startDocId, limit, asc, exclude } = req.query
+    const { startDocId, limit, asc } = req.query
 
     const result = await resultHandler(dbGetAllNotes(
         {
             startDocId: startDocId || null,
             limit: parseInt(limit) || 2,
-            asc: asc === 'true',
-            exclude: exclude === 'true'
+            asc: asc === 'true'
         }))
 
     return res.status(result.statusCode).json(result.data)

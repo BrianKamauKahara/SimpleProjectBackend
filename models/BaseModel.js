@@ -34,7 +34,7 @@ class BaseModel {
             .limit(limit)
 
         if (startDocId) {
-            const startDocSnap = await this.getDocOrThrow(id)
+            const startDocSnap = await this.getDocOrThrow(startDocId)
             query = query.startAfter(startDocSnap)
         }
 
@@ -64,15 +64,15 @@ class BaseModel {
     }
 
     static async updateById(id, data) {
-        console.log(data)
         if (typeof this.validate === 'function') {
             await this.validate(data, { all: false })
         }
 
         const doc = await this.getDocOrThrow(id)
 
+        const toUpdate = Object.fromEntries(Object.entries(data).filter(([_, v]) => v !== undefined))
         await doc.ref.update({
-            ...data,
+            ...toUpdate,
             updatedAt: admin.firestore.FieldValue.serverTimestamp()
         })
 
