@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config({ quiet: true })
 const { format } = require('date-fns')
 /* const { nanoid } = require('nanoid') */
 const fs = require('fs')
@@ -10,18 +10,18 @@ const { paths } = require('../config/paths')
 const getLogMessage = (message) => `${format(new Date(), 'yyyyMMdd\tHH:mm:ss')}\t${generateId(20)}\t${message}`
 
 const logEvents = async (message, fileName) => {
-    if (process.env.NODE_ENV !== "development") return
-    console.log('I should never be logged in production :(', process.env.NODE_ENV)
-    const logItem = getLogMessage(message)
+    if (process.env.NODE_ENV === "development") {
+        const logItem = getLogMessage(message)
 
-    try {
-        if (!fs.existsSync(paths.logs)) {
-            throw new Error('Please provide a path to store logs')
+        try {
+            if (!fs.existsSync(paths.logs)) {
+                throw new Error('Please provide a path to store logs')
+            }
+
+            await fsPromises.appendFile(paths.subPaths('logs', fileName), logItem)
+        } catch (err) {
+            console.error(err)
         }
-
-        await fsPromises.appendFile(paths.subPaths('logs', fileName), logItem)
-    } catch (err) {
-        console.error(err)
     }
 }
 
