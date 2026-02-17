@@ -10,7 +10,8 @@ const { paths } = require('../config/paths')
 const getLogMessage = (message) => `${format(new Date(), 'yyyyMMdd\tHH:mm:ss')}\t${generateId(20)}\t${message}`
 
 const logEvents = async (message, fileName) => {
-    if (!process.env.NODE_ENV === "development") return
+    if (process.env.NODE_ENV !== "development") return
+    console.log('I should never be logged in production :(', process.env.NODE_ENV)
     const logItem = getLogMessage(message)
 
     try {
