@@ -4,7 +4,9 @@ const PORT = process.env.PORT
 
 // // ---- IMPORTS
 const express = require('express')
+const cors = require('cors')
 const { paths, pathFor } = require('./config/paths')
+const corsOptions = require(pathFor('config', 'corsOptions'))
 
 
 // // ---- APP
@@ -18,6 +20,7 @@ const connectDB = require(pathFor('middleware', 'dbConn'))
 app.use(express.static(paths.static))
 app.use(express.json())
 app.use(logger)
+app.use(cors(corsOptions))
 app.use(connectDB)
 
 // // ---- ROUTES
