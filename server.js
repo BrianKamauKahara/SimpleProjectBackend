@@ -6,7 +6,7 @@ const PORT = process.env.PORT
 const express = require('express')
 const cors = require('cors')
 const { paths, pathFor } = require('./config/paths')
-const corsOptions = require(pathFor('config', 'corsOptions'))
+const corsOptions = require('./config/corsOptions')
 
 
 // // ---- APP
