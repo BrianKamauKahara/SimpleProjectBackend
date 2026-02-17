@@ -11,7 +11,6 @@ const corsOptions = require('./config/corsOptions')
 
 // // ---- APP
 const app = express()
-const db = require(pathFor('resources', 'database'))
 
 
 // // ---- MIDDLEWARE

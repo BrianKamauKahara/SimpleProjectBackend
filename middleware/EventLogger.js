@@ -1,3 +1,4 @@
+require('dotenv').config()
 const { format } = require('date-fns')
 /* const { nanoid } = require('nanoid') */
 const fs = require('fs')
@@ -9,6 +10,7 @@ const { paths } = require('../config/paths')
 const getLogMessage = (message) => `${format(new Date(), 'yyyyMMdd\tHH:mm:ss')}\t${generateId(20)}\t${message}`
 
 const logEvents = async (message, fileName) => {
+    if (!process.env.NODE_ENV === "development") return
     const logItem = getLogMessage(message)
 
     try {
