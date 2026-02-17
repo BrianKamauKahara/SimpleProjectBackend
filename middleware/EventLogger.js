@@ -27,19 +27,19 @@ const logEvents = async (message, fileName) => {
 const logger = (req, res, next) => {
     const origin = req.headers.origin ?? 'no-origin'
     const path = req.originalUrl ?? req.url ?? 'unknown-path'
-     
+
+    console.log(`${req.method}\t${origin}\t${path}\n`, process.env.NODE_ENV)
     logEvents(`${req.method}\t${origin}\t${path}\n`, 'requestLogs.log')
-    console.log(`${req.method}\t${path}`)
-    next()  
+    next()
 }
 
 function generateId(length = 16) {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  let result = ''
-  for (let i = 0; i < length; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length))
-  }
-  return result
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    let result = ''
+    for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length))
+    }
+    return result
 }
 
 
