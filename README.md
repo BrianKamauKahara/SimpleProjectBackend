@@ -142,7 +142,7 @@ npm run dev
 | GET    | /notes     | Fetch notes in a batch | Query params: `startDocId` (optional), `limit` (optional, default 2), `asc` (optional, default `false`) |
 | POST   | /notes     | Create a new note           | `{ title, content }`                                                                         |
 | GET    | /notes/:id | Get a note by ID            | `id`                                                                                         |
-| PUT    | /notes/:id | Update note by ID           | `id` + body                                                                                  |
+| PATCH    | /notes/:id | Update note by ID           | `id` + body                                                                                  |
 | DELETE | /notes/:id | Delete note by ID           | `id`                                                                                         |
 
 
