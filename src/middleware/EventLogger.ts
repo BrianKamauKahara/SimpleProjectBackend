@@ -1,31 +1,30 @@
-require('dotenv').config({ quiet: true })
-const { format } = require('date-fns')
-/* const { nanoid } = require('nanoid') */
-const fs = require('fs')
-const fsPromises = require('fs').promises
+import path from "path"
+import fs, { promises as fsPromises } from "fs"
 
+import { type Request, type Response, type NextFunction } from "express"
+import { format } from "date-fns"
 
-const { paths } = require('../config/paths')
+const getLogMessage = (message: string) => `${format(new Date(), 'yyyyMMdd\tHH:mm:ss')}\t${generateId(20)}\t${message}`
 
-const getLogMessage = (message) => `${format(new Date(), 'yyyyMMdd\tHH:mm:ss')}\t${generateId(20)}\t${message}`
-
-const logEvents = async (message, fileName) => {
+export const logEvents = async (message: string, fileName: string) => {
     if (process.env.NODE_ENV === "development") {
         const logItem = getLogMessage(message)
 
+        const logsFolder = path.join('..', 'logs')
+        const logFile = path.join('..', 'logs', fileName)
         try {
-            if (!fs.existsSync(paths.logs)) {
+            if (!fs.existsSync(logsFolder)) {
                 throw new Error('Please provide a path to store logs')
             }
 
-            await fsPromises.appendFile(paths.subPaths('logs', fileName), logItem)
+            await fsPromises.appendFile(logFile, logItem)
         } catch (err) {
             console.error(err)
         }
     }
 }
 
-const logger = (req, res, next) => {
+export const logger = (req: Request, res: Response, next: NextFunction) => {
     const origin = req.headers.origin ?? 'no-origin'
     const path = req.originalUrl ?? req.url ?? 'unknown-path'
 
@@ -42,6 +41,3 @@ function generateId(length = 16) {
     }
     return result
 }
-
-
-module.exports = { logger, logEvents }

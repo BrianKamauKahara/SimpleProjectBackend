@@ -1,36 +1,33 @@
 // // ---- ENV VARIABLES
-require('dotenv').config({ quiet: true })
-const PORT = process.env.PORT
+import dotenv from 'dotenv'
+dotenv.config({ quiet: true })
+const PORT = process.env.PORT || 5000
 
 // // ---- IMPORTS
-const express = require('express')
-const cors = require('cors')
-const { paths, pathFor } = require('./config/paths')
-const corsOptions = require('./config/corsOptions')
-
+import express, { type Request, type Response } from 'express'
+import cors from 'cors'
+import corsOptions from './config/corsOptions'
 
 // // ---- APP
 const app = express()
 
 
 // // ---- MIDDLEWARE
-const { logger, logEvents } = require(pathFor('middleware', 'EventLogger'))
-const connectDB = require(pathFor('middleware', 'dbConn'))
-app.use(express.static(paths.static))
+import { logger } from './middleware/EventLogger'
+const connectDB = require('./middleware/dbConn')
 app.use(express.json())
 app.use(logger)
 app.use(cors(corsOptions))
 app.use(connectDB)
 
 // // ---- ROUTES
-app.use('/notes', require(pathFor('routes', 'notesRoutes')))
-
+app.use('/notes', require('./routes/notesRoutes'))
 
 // // ---- ERROR HANDLING
-const errorLogger = require(pathFor('middleware', 'ErrorLogger'))
+const errorLogger = require('./middleware/ErrorLogger')
 app.use(errorLogger)
 
-app.all(/^\/.*/, (req, res) => {
+app.all(/^\/.*/, (req: Request, res: Response) => {
     res.status(404)
 
     if (req.accepts('json')) {

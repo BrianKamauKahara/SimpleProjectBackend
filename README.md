@@ -1,4 +1,4 @@
-# Simple Notes Backe.d Project
+# Simple Notes Backend Project
 
 This is a small project intended to re-learn how to set up and deploy a simple backend that stores notes.
 
