@@ -1,8 +1,7 @@
-const { pathFor } = require('../config/paths')
-const Note = require(pathFor('models', 'Note'))
+import Note from '../models/Note'
 
 // // ---- UTIL
-const wrapAsync = async (promise, {onSuccess, onError} = {}) => {
+const wrapAsync = async (promise, { onSuccess, onError } = {}) => {
     try {
         const result = await promise
 

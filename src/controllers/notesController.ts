@@ -1,12 +1,11 @@
-const asyncHandler = require('express-async-handler')
-const { pathFor } = require('../config/paths')
-const {
+import asyncHandler from "express-async-handler"
+import {
     dbGetAllNotes,
     dbGetNote,
     dbCreateAndStoreNote,
     dbUpdateNote,
     dbDeleteNote
-} = require(pathFor('services', 'noteServices'))
+} from '../services/noteServices'
 
 
 // // --------UTIL

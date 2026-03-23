@@ -1,11 +1,10 @@
-const admin = require('firebase-admin')
+import admin from 'firebase-admin'
 
-const { DocumentNotFoundError } = require('./Errors')
-const { pathFor } = require('../config/paths')
-const db = require(pathFor('resources', 'database'))
+import { DocumentNotFoundError } from './Errors'
+import db from '../resources/database'
 
-class BaseModel {
-    static collection() {
+export default class FireBaseModel {
+    static collection(): string | never {
         throw new Error('collection() not implemented')
     }
 
@@ -13,7 +12,7 @@ class BaseModel {
         return db.collection(this.collection())
     }
 
-    static async getDocOrThrow(id) {
+    static async getDocOrThrow(id: string) {
         const doc = await this.ref().doc(id).get()
 
         if (!doc.exists) {
@@ -28,9 +27,11 @@ class BaseModel {
         return { id: d.id, ...d.data() }
     }
 
-    static async findAll({ startDocId, limit = 10, asc = false } = {}) {
+
+    static async findAll(startDocId: string, limit: number = 10, order: 'asc' | 'desc' = 'desc') {
+        const refme = this.ref()
         let query = this.ref()
-            .orderBy('createdAt', asc ? 'asc' : 'desc')
+            .orderBy('createdAt', order)
             .limit(limit)
 
         if (startDocId) {
@@ -89,3 +90,11 @@ class BaseModel {
 }
 
 module.exports = BaseModel
+
+
+import * as z from 'zod'
+
+const player = z.object({
+    username: z.string(),
+    xp: z.number()
+})

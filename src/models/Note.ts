@@ -1,4 +1,4 @@
-const BaseModel = require('./BaseModel')
+import BaseModel from './BaseModel'
 const { BadRequestError, ValidationError } = require('./Errors')
 
 class Note extends BaseModel {

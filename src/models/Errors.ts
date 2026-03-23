@@ -1,30 +1,33 @@
-class AppError extends Error {
-    constructor(message, statusCode) {
-        super(message)
-        this.statusCode = statusCode
-        this.isOperational = true
-        this.name = this.constructor.name
+export class AppError extends Error {
+    statusCode: number;
+    isOperational: boolean;
 
-        Error.captureStackTrace(this, this.constructor)
+    constructor(message: string, statusCode: number) {
+        super(message);
+        this.name = this.constructor.name;
+        this.statusCode = statusCode;
+        this.isOperational = true;
+
+        Error.captureStackTrace(this, this.constructor);
     }
 }
 
-class DocumentNotFoundError extends AppError {
-    constructor(message) {
+export type AppErrorInstance = AppError;
+
+export class DocumentNotFoundError extends AppError {
+    constructor(message: string) {
         super(message, 404)
     }
 }
 
-class BadRequestError extends AppError {
-    constructor(message) {
+export class BadRequestError extends AppError {
+    constructor(message: string) {
         super(message, 400)
     }
 }
 
-class ValidationError extends AppError {
-    constructor(message) {
+export class ValidationError extends AppError {
+    constructor(message: string) {
         super(message, 400)
     }
 }
-
-module.exports = { DocumentNotFoundError, BadRequestError, ValidationError }

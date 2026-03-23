@@ -14,7 +14,7 @@ const app = express()
 
 // // ---- MIDDLEWARE
 import { logger } from './middleware/EventLogger'
-const connectDB = require('./middleware/dbConn')
+import connectDB from './middleware/dbConn'
 app.use(express.json())
 app.use(logger)
 app.use(cors(corsOptions))

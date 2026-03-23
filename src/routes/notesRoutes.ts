@@ -1,14 +1,13 @@
-const express = require('express')
+import express from 'express'
 const router = express.Router()
 
-const { pathFor } = require('../config/paths')
-const { 
+import {
     getAllNotes,
     getNote,
     addNote,
     updateNote,
     deleteNote
-} = require(pathFor('controllers', 'notesController'))
+} from '../controllers/notesController'
 
 router.route('/')
     .get(getAllNotes)
