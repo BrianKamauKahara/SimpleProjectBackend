@@ -1,18 +1,27 @@
 import admin from 'firebase-admin'
 
-import { DocumentNotFoundError } from './Errors'
+import { DocumentNotFoundError, BadRequestError, ValidationError } from './Errors'
 import db from '../resources/database'
+import { z } from 'zod'
 
-export default class FireBaseModel {
-    static collection(): string | never {
-        throw new Error('collection() not implemented')
+interface findAllQueryConfig {
+    startDocId?: string,
+    limit?: number
+    order?: 'asc' | 'desc'
+}
+
+export default class FireBaseModel<T extends z.ZodRawShape> {
+    constructor(
+        public collection: string,
+        public schema: z.ZodObject<T>
+    ) { }
+
+    // Properties to save, update, delete, format et, cetera
+    ref() {
+        return db.collection(this.collection)
     }
 
-    static ref() {
-        return db.collection(this.collection())
-    }
-
-    static async getDocOrThrow(id: string) {
+    async getDocOrThrow(id: string) {
         const doc = await this.ref().doc(id).get()
 
         if (!doc.exists) {
@@ -23,13 +32,13 @@ export default class FireBaseModel {
         return doc
     }
 
-    static format(d) {
+    format(d: admin.firestore.DocumentSnapshot) {
         return { id: d.id, ...d.data() }
     }
 
+    async findAll(qry: findAllQueryConfig) {
+        const { order = 'asc', limit = 10, startDocId } = qry
 
-    static async findAll(startDocId: string, limit: number = 10, order: 'asc' | 'desc' = 'desc') {
-        const refme = this.ref()
         let query = this.ref()
             .orderBy('createdAt', order)
             .limit(limit)
@@ -43,11 +52,7 @@ export default class FireBaseModel {
         return snap.docs.map(d => this.format(d))
     }
 
-    static async create(data) {
-        if (typeof this.validate === 'function') {
-            await this.validate(data, { all: true })
-        }
-
+    async create(data: T) {
         const ref = await this.ref().add({
             ...data,
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -58,13 +63,13 @@ export default class FireBaseModel {
         return this.format(doc)
     }
 
-    static async findById(id) {
+    async findById(id: string) {
         const doc = await this.getDocOrThrow(id)
 
         return this.format(doc)
     }
 
-    static async updateById(id, data) {
+    async updateById(id: string, data: T) {
         if (typeof this.validate === 'function') {
             await this.validate(data, { all: false })
         }
@@ -80,7 +85,7 @@ export default class FireBaseModel {
         return this.findById(id)
     }
 
-    static async deleteById(id) {
+    async deleteById(id) {
         const doc = await this.getDocOrThrow(id)
 
         await doc.ref.delete()
@@ -89,12 +94,5 @@ export default class FireBaseModel {
     }
 }
 
-module.exports = BaseModel
 
 
-import * as z from 'zod'
-
-const player = z.object({
-    username: z.string(),
-    xp: z.number()
-})

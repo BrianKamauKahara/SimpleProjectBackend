@@ -12,8 +12,6 @@ export class AppError extends Error {
     }
 }
 
-export type AppErrorInstance = AppError;
-
 export class DocumentNotFoundError extends AppError {
     constructor(message: string) {
         super(message, 404)
