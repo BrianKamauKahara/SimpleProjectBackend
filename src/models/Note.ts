@@ -1,52 +1,47 @@
-import FireBaseModel from './BaseModel'
+import FireBaseModel from './FireBaseModel'
 import { z } from 'zod'
 
-const noteSchema = z.object({
+/**
+ * Define the schema for a Note.
+ * - title: required non-empty string
+ * - content: required non-empty string
+ * Using Zod for runtime validation.
+ */
+export const noteSchema = z.object({
     title: z.string().min(1, { error: 'Title must be a non-empty string' }),
     content: z.string().min(1, { error: 'Content must be a non-empty string' }),
 })
 
+
+/**
+ * Create a FireBaseModel instance for notes collection.
+ * Provides CRUD methods for interacting with Firestore.
+*/
 export const Note = new FireBaseModel('notes', noteSchema)
 
-/* 
 
-import BaseModel from './BaseModel'
-const { BadRequestError, ValidationError } = require('./Errors')
-import * as z from 'zod'
-
-class Note extends BaseModel {
-    static collection() {
-        return 'notes'
-    }
-
-    static schema = z.object({
-        title: z.string().min(1, {error: 'Title must be a non-empty string'}),
-        content: z.string().min(1, { error: 'Content must be a non-empty string' }),
-    })
-
-    static async validate({ title, content }, { all } = {}) {
-        if (all) {
-            this.validateTitle(title)
-            this.validateContent(content)
-        } else {
-            if (title !== undefined) this.validateTitle(title)
-            else if (content !== undefined) this.validateContent(content)
-            else throw new BadRequestError('Nothing to Update')
-        }
-    }
-
-    static validateTitle(title) {
-        if (!title || typeof title !== 'string') {
-            throw new ValidationError('Title must be a non-empty string')
-        }
-    }
-
-    static validateContent(content) {
-        if (!content || typeof content !== 'string') {
-            throw new ValidationError('Content must be a non-empty string')
-        }
-    }
-}
-
-module.exports = Note
+/**
+ * Helper functions for database operations.
 */
+import { type findAllQueryConfig } from './FireBaseModel'
+type NoteType = z.infer<typeof noteSchema>
+
+// Retrieve all notes with optional query config 
+export const dbGetAllNotes = async (config: findAllQueryConfig) =>
+    await Note.findAll(config)
+
+// Retrieve a single note by its ID.
+export const dbGetNote = async (id: string) =>
+    await Note.findById(id)
+
+// Create and store a new note. Accepts an object matching NoteType
+export const dbCreateAndStoreNote = async ({ title, content }: NoteType) =>
+    await Note.create({ title, content })
+
+// Update an existing note by ID. Accepts partial updates validated by FireBaseModel.
+export const dbUpdateNote = async (id: string, { title, content }: Partial<NoteType>) =>
+    await Note.updateById(id, { title, content })
+
+// Delete a note by its ID.
+export const dbDeleteNote = async (id: string) =>
+    await Note.deleteById(id)

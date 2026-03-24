@@ -2,16 +2,22 @@ import admin from 'firebase-admin'
 
 import { DocumentNotFoundError, BadRequestError, ValidationError } from './Errors'
 import db from '../resources/database'
-import { success, z, ZodError } from 'zod'
+import { z, ZodError } from 'zod'
 
 // Useful Types
-type DocumentSnapshotDataType = admin.firestore.DocumentSnapshot<admin.firestore.DocumentData, admin.firestore.DocumentData>
 type Infer<T extends z.ZodRawShape> = z.infer<z.ZodObject<T>>
-interface findAllQueryConfig {
-    startDocId?: string,
-    limit?: number
-    order?: 'asc' | 'desc'
+type DocSnapType = admin.firestore.DocumentSnapshot<admin.firestore.DocumentData, admin.firestore.DocumentData>
+type DbDocType<T extends z.ZodRawShape> = Infer<T> & {
+    createdAt: admin.firestore.Timestamp,
+    updatedAt: admin.firestore.Timestamp
 }
+
+export const findAllQueryParams = z.object({
+    startDocId: z.string(),
+    limit: z.coerce.number<number>(),
+    order: z.literal(['asc', 'desc'])
+})
+export type findAllQueryConfig = z.infer<typeof findAllQueryParams>
 
 export default class FireBaseModel<T extends z.ZodRawShape> {
     constructor(
@@ -24,8 +30,12 @@ export default class FireBaseModel<T extends z.ZodRawShape> {
         return db.collection(this.collection)
     }
 
-    private format(d: DocumentSnapshotDataType) {
-        return { id: d.id, ...d.data() }
+    private format(d: DocSnapType) {
+        if (!d.exists) {
+            throw new DocumentNotFoundError(`Document with id ${d.id} somehow does not exist`)
+        }
+
+        return { id: d.id, ...d.data() as DbDocType<T> }
     }
 
     // Sensitive methods interacting directly with database with WRITE access
@@ -37,12 +47,11 @@ export default class FireBaseModel<T extends z.ZodRawShape> {
         })
     }
 
-    private async updateItem(doc: DocumentSnapshotDataType, data: Partial<Infer<T>>) {
+    private async updateItem(doc: DocSnapType, data: Partial<Infer<T>>) {
         doc.ref.update({
             ...data,
             updatedAt: admin.firestore.FieldValue.serverTimestamp()
         })
-
     }
 
     private async getDocOrThrow(id: string) {

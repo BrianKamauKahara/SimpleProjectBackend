@@ -1,113 +1,105 @@
-import asyncHandler from "express-async-handler"
+import { type Request, type Response } from "express"
 import {
     dbGetAllNotes,
     dbGetNote,
     dbCreateAndStoreNote,
     dbUpdateNote,
-    dbDeleteNote
-} from '../services/noteServices'
-import { type Request, type Response } from "express"
-
+    dbDeleteNote,
+    noteSchema
+} from '../models/Note'
+import { BadRequestError, ValidationError } from '../models/Errors'
+import { z } from 'zod'
+import { findAllQueryParams, type findAllQueryConfig } from "../models/FireBaseModel"
 
 // // --------UTIL
-const errorCodes = {
-    'not-found': 404,
-    5: 404, // gRPC fallback
-    'already-exists': 409,
-    6: 409,
-    'permission-denied': 403,
-    7: 403,
-    'unavailable': 500,
-    14: 500,
-    'bad-request': 400
-}
-
-
-const resultHandler = async (promise, successCode = 200) => {
-    try {
-        const result = await promise
-
-        return {
-            statusCode: successCode,
-            data: result
-        }
-    } catch (err) {
-        if (!err.isOperational) throw err
-
-        console.log(err)
-        return {
-            statusCode: err.statusCode || errorCodes[err.code],
-            data: {
-                message: err.message,
-                stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
-            }
-        }
+const parseId = (id: string | string[] | undefined): string | never => {
+    if (Array.isArray(id)) {
+        throw new BadRequestError('Invalid ID format')
     }
+
+    if (!id || id.trim() === '') throw new BadRequestError('Missing ID')
+
+    return id
 }
 
-// // --------FUNC
+const parseNoteData = (body: Record<any, any>): z.infer<typeof noteSchema> | never => {
+    const result = noteSchema.safeParse(body)
+
+    if (!result.success) {
+        throw new ValidationError(result.error.message)
+    }
+
+    return result.data
+}
+
+const parseQuery = (qry: Record<any, any>): findAllQueryConfig | never => {
+    const result = findAllQueryParams.safeParse(qry)
+
+    if (!result.success) {
+        throw new BadRequestError(result.error.message)
+    }
+
+    return result.data
+}
+
+// // -------- ROUTES
 
 // @desc Get all notes
 // @route GET /
 // @access Private
-const getAllNotes = asyncHandler(async (req: Request, res: Response) => {
-    const { startDocId = null, limit = 2, order = 'asc' } = req.query
+const getAllNotes = async (req: Request, res: Response) => {
+    const { startDocId, limit, order } = parseQuery(req.query)
 
-    const result = await resultHandler(dbGetAllNotes(
-        {
-            startDocId: startDocId,
-            limit: parseInt(limit),
-            order: order
-        }))
+    const notes = await dbGetAllNotes({ startDocId, limit, order })
 
-    res.status(result.statusCode).json(result.data)
-})
+    return res.status(200).json(notes)
+}
 
 // @desc Add new note
 // @route POST /
 // @access Private
-const addNote = asyncHandler(async (req, res) => {
-    const { title, content } = req.body
+const addNote = async (req: Request, res: Response) => {
+    const { title, content } = parseNoteData(req.body)
 
-    const result = await resultHandler(dbCreateAndStoreNote(title, content), 201)
+    const newNote = await dbCreateAndStoreNote({ title, content })
 
-    return res.status(result.statusCode).json(result.data)
-})
+    return res.status(201).json(newNote)
+}
 
 // @desc Get specified note
 // @route GET /:id
 // @access Private
-const getNote = asyncHandler(async (req, res) => {
-    const id = req.params.id
+const getNote = async (req: Request, res: Response) => {
+    const id = parseId(req.params.id)
 
-    const result = await resultHandler(dbGetNote(id))
+    const note = await dbGetNote(id)
 
-    return res.status(result.statusCode).json(result.data)
-})
+    return res.status(200).json(note)
+}
 
 // @desc Update specified note
 // @route PATCH /:id
 // @access Private
-const updateNote = asyncHandler(async (req, res) => {
-    const id = req.params.id
-    const { title, content } = req.body
+const updateNote = async (req: Request, res: Response) => {
+    const id = parseId(req.params.id)
+    const { title, content } = parseNoteData(req.body)
 
-    const result = await resultHandler(dbUpdateNote(id, { title, content }))
+    const updatedNote = await dbUpdateNote(id, { title, content })
 
-    return res.status(result.statusCode).json(result.data)
-})
+    return res.status(200).json(updatedNote)
+}
 
 
 // @desc Delete Update specified note
 // @route DELETE /:id
 // @access Private
-const deleteNote = asyncHandler(async (req, res) => {
-    const id = req.params.id
+const deleteNote = async (req: Request, res: Response) => {
+    const id = parseId(req.params.id)
 
-    const result = await resultHandler(dbDeleteNote(id))
+    const result = await dbDeleteNote(id)
 
-    return res.status(result.statusCode).json(result.data)
-})
+    return res.sendStatus(204)
+}
 
 module.exports = {
     getAllNotes,
