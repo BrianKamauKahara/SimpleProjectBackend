@@ -6,6 +6,7 @@ import {
     dbUpdateNote,
     dbDeleteNote
 } from '../services/noteServices'
+import { type Request, type Response } from "express"
 
 
 // // --------UTIL
@@ -49,17 +50,17 @@ const resultHandler = async (promise, successCode = 200) => {
 // @desc Get all notes
 // @route GET /
 // @access Private
-const getAllNotes = asyncHandler(async (req, res) => {
-    const { startDocId, limit, asc } = req.query
+const getAllNotes = asyncHandler(async (req: Request, res: Response) => {
+    const { startDocId = null, limit = 2, order = 'asc' } = req.query
 
     const result = await resultHandler(dbGetAllNotes(
         {
-            startDocId: startDocId || null,
-            limit: parseInt(limit) || 2,
-            asc: asc === 'true'
+            startDocId: startDocId,
+            limit: parseInt(limit),
+            order: order
         }))
 
-    return res.status(result.statusCode).json(result.data)
+    res.status(result.statusCode).json(result.data)
 })
 
 // @desc Add new note
