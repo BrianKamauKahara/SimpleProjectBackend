@@ -5,7 +5,7 @@ import { AppError } from '../models/Errors'
 const errorLogger = (err: Error | AppError, req: Request, res: Response, next: NextFunction) => {
     logEvents(`${err.name}:\t ${err.message}\t${req.method}\t${req.headers.origin}\t${req.url}\n`, 'errLog.log')
 
-    console.error(err.stack)
+    process.env.NODE_ENV === 'development' && console.error(err.stack)
 
     return res
         .status(err instanceof AppError ? err.statusCode : 500)
@@ -13,4 +13,4 @@ const errorLogger = (err: Error | AppError, req: Request, res: Response, next: N
 }
 
 
-module.exports = errorLogger 
+export default errorLogger

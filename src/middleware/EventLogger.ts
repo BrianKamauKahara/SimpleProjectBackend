@@ -7,21 +7,22 @@ import { format } from "date-fns"
 const getLogMessage = (message: string) => `${format(new Date(), 'yyyyMMdd\tHH:mm:ss')}\t${generateId(20)}\t${message}`
 
 export const logEvents = async (message: string, fileName: string) => {
-    if (process.env.NODE_ENV === "development") {
-        const logItem = getLogMessage(message)
+    if (process.env.NODE_ENV !== "development") return
 
-        const logsFolder = path.join('..', 'logs')
-        const logFile = path.join('..', 'logs', fileName)
-        try {
-            if (!fs.existsSync(logsFolder)) {
-                throw new Error('Please provide a path to store logs')
-            }
+    const logItem = getLogMessage(message)
 
-            await fsPromises.appendFile(logFile, logItem)
-        } catch (err) {
-            console.error(err)
+    const logsFolder = path.join('..', 'logs')
+    const logFile = path.join('..', 'logs', fileName)
+    try {
+        if (!fs.existsSync(logsFolder)) {
+            throw new Error('Please provide a path to store logs')
         }
+
+        await fsPromises.appendFile(logFile, logItem)
+    } catch (err) {
+        console.error(err)
     }
+
 }
 
 export const logger = (req: Request, res: Response, next: NextFunction) => {

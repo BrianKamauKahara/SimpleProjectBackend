@@ -47,7 +47,7 @@ const parseQuery = (qry: Record<any, any>): findAllQueryConfig | never => {
 // @desc Get all notes
 // @route GET /
 // @access Private
-const getAllNotes = async (req: Request, res: Response) => {
+export const getAllNotes = async (req: Request, res: Response) => {
     const { startDocId, limit, order } = parseQuery(req.query)
 
     const notes = await dbGetAllNotes({ startDocId, limit, order })
@@ -58,7 +58,7 @@ const getAllNotes = async (req: Request, res: Response) => {
 // @desc Add new note
 // @route POST /
 // @access Private
-const addNote = async (req: Request, res: Response) => {
+export const addNote = async (req: Request, res: Response) => {
     const { title, content } = parseNoteData(req.body)
 
     const newNote = await dbCreateAndStoreNote({ title, content })
@@ -69,7 +69,7 @@ const addNote = async (req: Request, res: Response) => {
 // @desc Get specified note
 // @route GET /:id
 // @access Private
-const getNote = async (req: Request, res: Response) => {
+export const getNote = async (req: Request, res: Response) => {
     const id = parseId(req.params.id)
 
     const note = await dbGetNote(id)
@@ -80,7 +80,7 @@ const getNote = async (req: Request, res: Response) => {
 // @desc Update specified note
 // @route PATCH /:id
 // @access Private
-const updateNote = async (req: Request, res: Response) => {
+export const updateNote = async (req: Request, res: Response) => {
     const id = parseId(req.params.id)
     const { title, content } = parseNoteData(req.body)
 
@@ -93,7 +93,7 @@ const updateNote = async (req: Request, res: Response) => {
 // @desc Delete Update specified note
 // @route DELETE /:id
 // @access Private
-const deleteNote = async (req: Request, res: Response) => {
+export const deleteNote = async (req: Request, res: Response) => {
     const id = parseId(req.params.id)
 
     const result = await dbDeleteNote(id)
