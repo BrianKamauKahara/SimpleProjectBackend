@@ -6,6 +6,9 @@ import { z, ZodError } from 'zod'
 
 // Useful Types
 type Infer<T extends z.ZodRawShape> = z.infer<z.ZodObject<T>>
+type AtLeastOne<T> = {
+    [K in keyof T]: Pick<T, K>
+}[keyof T] & Partial<T>
 type DocSnapType = admin.firestore.DocumentSnapshot<admin.firestore.DocumentData, admin.firestore.DocumentData>
 type DbDocType<T extends z.ZodRawShape> = Infer<T> & {
     createdAt: admin.firestore.Timestamp,
@@ -13,9 +16,9 @@ type DbDocType<T extends z.ZodRawShape> = Infer<T> & {
 }
 
 export const findAllQueryParams = z.object({
-    startDocId: z.string(),
-    limit: z.coerce.number<number>(),
-    order: z.literal(['asc', 'desc'])
+    startDocId: z.string().trim().optional(),
+    limit: z.coerce.number<number>().optional(),
+    order: z.literal(['asc', 'desc']).optional()
 })
 export type findAllQueryConfig = z.infer<typeof findAllQueryParams>
 
@@ -47,7 +50,7 @@ export default class FireBaseModel<T extends z.ZodRawShape> {
         })
     }
 
-    private async updateItem(doc: DocSnapType, data: Partial<Infer<T>>) {
+    private async updateItem(doc: DocSnapType, data: AtLeastOne<Infer<T>>) {
         doc.ref.update({
             ...data,
             updatedAt: admin.firestore.FieldValue.serverTimestamp()
@@ -118,7 +121,7 @@ export default class FireBaseModel<T extends z.ZodRawShape> {
 
         const doc = await this.getDocOrThrow(id)
 
-        await this.updateItem(doc, result.data as Partial<Infer<T>>) // Interesting
+        await this.updateItem(doc, result.data as AtLeastOne<Infer<T>>) // Interesting
         return this.findById(id)
     }
 

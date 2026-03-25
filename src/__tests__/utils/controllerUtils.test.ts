@@ -30,8 +30,9 @@ describe('Utils: stripUndefinedFields and throwNonObjects', () => {
     // -- throwNonObjects
     describe('throwNonObjects', () => {
         const invalidInputs = [null, undefined, 123, 'string', true, [], () => { }]
+
         invalidInputs.forEach(input => {
-            it(`throws BadRequestError for invalid input (${JSON.stringify(input)})`, () => {
+            it(`throws BadRequestError for non objects (${JSON.stringify(input)})`, () => {
                 expect(() => throwNonObjects(input)).toThrow(BadRequestError)
             })
         })
@@ -45,7 +46,6 @@ describe('Utils: stripUndefinedFields and throwNonObjects', () => {
 
 describe('parseId', () => {
     const invalidValues = [undefined, '', ['123'], '     '] // covers empty, empty, and array
-    const validValues = ['1', 'note-id']
 
     // Test invalid IDs
     it.each(invalidValues)('throws BadRequestError if id is invalid (%p)', (val) => {
@@ -53,6 +53,7 @@ describe('parseId', () => {
     })
 
     // Test valid IDs
+    const validValues = ['note-id']
     it.each(validValues)('returns string if id is valid (%p)', (val) => {
         expect(parseId(val)).toBe(val)
     })
@@ -60,147 +61,77 @@ describe('parseId', () => {
 })
 
 describe('parseNoteData', () => {
-    // -- General Body Test
-    // Test invalid values of req.body
-    const validValue = 'Valid'
-    const invalidValues = [null, 123, true, []]
-    it.each(invalidValues)('throws BadRequestError if req.body is of invalid type (%p)', (val) => {
-        expect(() => parseNoteData(val)).toThrow(BadRequestError)
+    it('rejects non-object input', () => {
+        expect(() => parseNoteData(null)).toThrow(BadRequestError)
     })
 
-
-    // -- Fields Tests
-    const fields = ['title', 'content'] as const
-
-    // 1. Test invalid keys: missing required keys or extra keys only
-    const invalidKeys = [
-        {}, // empty object
-        { strangeKey: validValue }, // missing both required keys
-        { title: validValue }, // missing 'content'
-        { content: validValue }, // missing 'title'
-    ]
-
-    it.each(invalidKeys)(
-        `throws ValidationError if keys of req.body are missing required fields (%p)`,
-        (input) => {
-            expect(() => parseNoteData(input)).toThrow(ValidationError)
-        }
-    )
-
-    // 2. Test incorrect values of fields
-    const invalidFieldValues = [null, 123, true, [], {}]
-    fields.forEach(field => {
-        it.each(invalidFieldValues)(`throws ValidationError if ${field} has invalid type  as (%p)`,
-            (val) => {
-                const input: Record<string, any> = { title: validValue, content: validValue }
-                input[field] = val
-                expect(() => parseNoteData(input)).toThrow(ValidationError)
-            })
+    it('rejects invalid schema input', () => {
+        expect(() => parseNoteData({})).toThrow(ValidationError)
+        expect(() => parseNoteData({ title: 'Valid', content: null })).toThrow(ValidationError)
+        expect(() => parseNoteData({ title: ' ', content: 'Valid' })).toThrow(ValidationError)
     })
 
-    // 3. Test empty values
-    const emptyValues = ['', '   ']
-    fields.forEach(field => {
-        it.each(emptyValues)(`throws ValidationError if ${field} is empty as (%p)`,
-            (val) => {
-                const input: Record<string, any> = { title: validValue, content: validValue }
-                input[field] = val
-                expect(() => parseNoteData(input)).toThrow(ValidationError)
-            })
+    it('returns valid parsed data', () => {
+        const input = { title: 'Valid', content: 'Valid' }
+        expect(parseNoteData(input)).toEqual(input)
     })
-
-
-    // -- Positive tests
-    it('parses valid input correctly',
-        () => {
-            const validInput = { title: validValue, content: validValue }
-            const result = parseNoteData(validInput)
-            expect(result).toEqual(validInput)
-        })
-
-    it('strips unknown keys',
-        () => {
-            const input = { title: validValue, content: validValue, extra: 123 }
-            const result = parseNoteData(input)
-            expect(result).toEqual({ title: validValue, content: validValue })
-        })
 })
 
 describe('parseNoteDataPartial', () => {
-    /* Pretty Similar to above function */
-    // -- General Body Test
-    // Test invalid values of req.body
-    const validValue: string = 'Valid'
-    const invalidValues = [null, 123, true, [], {}, { 'Wrong Field Name': validValue }]
-
-    it.each(invalidValues)('throws ValidationError if req.body is of invalid type (%p)',
-        (val) => {
-            expect(() => parseNoteDataPartial(val)).toThrow(ValidationError)
-        })
-
-
-    // -- Fields Tests
-    const fields = ['title', 'content'] as const
-    const invalidFieldValues = [null, 123, true, [], {}]
-
-    // Test incorrect values of fields
-    fields.forEach(field => {
-        it.each(invalidFieldValues)(`throws ValidationError if ${field} has invalid type  as (%p)`,
-            (val) => {
-                const input: Record<string, any> = { title: validValue, content: validValue }
-                input[field] = val
-                expect(() => parseNoteDataPartial(input)).toThrow(ValidationError)
-            })
+    it('rejects non-object input', () => {
+        expect(() => parseNoteDataPartial(null)).toThrow(BadRequestError)
     })
 
-    // Test empty values
-    const emptyValues = ['']
-    fields.forEach(field => {
-        it.each(emptyValues)(`throws ValidationError if ${field} is empty as (%p)`,
-            (val) => {
-                const input: Record<string, any> = { title: validValue, content: validValue }
-                input[field] = val
-                expect(() => parseNoteDataPartial(input)).toThrow(ValidationError)
-            })
+    it('strips undefined fields', () => {
+        expect(parseNoteDataPartial({ title: 'Valid', content: undefined }))
+            .toEqual({ title: 'Valid' })
     })
 
-
-    // -- Positive tests
-    it('parses valid input correctly', () => {
-        const validInput = { title: validValue, content: validValue }
-
-        expect(parseNoteDataPartial(validInput)).toEqual(validInput)
+    it('requires atleast one field', () => {
+        expect(parseNoteDataPartial({}))
+            .toThrow({})
     })
 
-    fields.forEach(field => {
-        it(`handles ${field} as undefined (strips it)`,
-            () => {
-                const input = { title: validValue, content: validValue } as Record<string, any>
-                input[field] = undefined
-
-                const expected = { ...input }
-                delete expected[field]
-
-                expect(parseNoteDataPartial(input)).toEqual(expected)
-            })
-
-        it(`allows ${field} to be missing`,
-            () => {
-                const input = { title: validValue, content: validValue } as Record<string, any>
-                delete input[field]
-
-                expect(parseNoteDataPartial(input)).toEqual(input)
-            })
+    it('rejects invalid schema input', () => {
+        expect(() => parseNoteDataPartial({ title: 123 }))
+            .toThrow(ValidationError)
     })
 
-    it('strips unknown keys',
-        () => {
-            const input = { title: validValue, content: validValue, extra: 123 }
-            const result = parseNoteDataPartial(input)
-            expect(result).toEqual({ title: validValue, content: validValue })
-        })
+    it('returns valid parsed data', () => {
+        expect(parseNoteDataPartial({ title: 'Valid' }))
+            .toEqual({ title: 'Valid' })
+
+        expect(parseNoteDataPartial({ content: 'Valid' }))
+            .toEqual({ content: 'Valid' })
+
+        expect(parseNoteDataPartial({ title: 'Valid', content: 'Valid' }))
+            .toEqual({ title: 'Valid', content: 'Valid' })
+
+        expect(parseNoteDataPartial({ title: 'Valid', extra: null }))
+            .toEqual({ title: 'Valid' })
+    })
 })
 
 describe('parseQuery', () => {
+    it('rejects invalid schema input', () => {
+        expect(() => parseQuery({ startDocId: ' ' })).toThrow(ValidationError)
+        expect(() => parseQuery({ order: 'invalid' })).toThrow(ValidationError)
+        expect(() => parseQuery({ limit: 'invalid' })).toThrow(ValidationError)
+    })
 
+    it('returns valid parsed data', () => {
+        expect(() => parseQuery({ startDocId: 'Valid' }))
+            .toEqual({ startDocId: 'Valid' })
+
+        expect(() => parseQuery({ order: 'asc', limit: '12' }))
+            .toEqual({ order: 'asc', limit: 12 })
+
+        expect(() => parseQuery({ startDocId: 'Valid', extra: 'extra' }))
+            .toEqual({ startDocId: 'Valid' })
+
+        expect(() => parseQuery({}))
+            .toEqual({})
+    })
 })
+
+

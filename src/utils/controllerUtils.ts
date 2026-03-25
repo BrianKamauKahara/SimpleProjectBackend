@@ -1,4 +1,3 @@
-import z from "zod"
 import { type Request } from 'express'
 import { BadRequestError, ValidationError } from "../models/Errors"
 import { type findAllQueryConfig, findAllQueryParams } from "../models/FireBaseModel"
@@ -30,7 +29,7 @@ export const parseId = (id: string | string[] | undefined): string | never => {
     return id
 }
 
-export const parseNoteData = (body: unknown): NoteType | never => {
+export const parseNoteData = (body: Request['body']): NoteType | never => {
     const bodyAsObject = throwNonObjects(body)
 
     const result = noteSchema.safeParse(bodyAsObject)
@@ -42,10 +41,14 @@ export const parseNoteData = (body: unknown): NoteType | never => {
     return result.data
 }
 
-export const parseNoteDataPartial = (body: unknown): Partial<NoteType> | never => {
+export const parseNoteDataPartial = (body: Request['body']): Partial<NoteType> | never => {
     const bodyAsObject = throwNonObjects(body)
 
     const strippedObject = stripUndefinedFields(bodyAsObject)
+
+    if (!Object.keys(strippedObject).length) {
+        throw new ValidationError('Nothing to update')
+    }
 
     const result = noteSchema.partial().safeParse(strippedObject)
 
@@ -57,9 +60,7 @@ export const parseNoteDataPartial = (body: unknown): Partial<NoteType> | never =
 }
 
 export const parseQuery = (qry: Request['query']): findAllQueryConfig | never => {
-    const qryAsObj = throwNonObjects(qry)
-
-    const result = findAllQueryParams.safeParse(qryAsObj)
+    const result = findAllQueryParams.partial().safeParse(qry)
 
     if (!result.success) {
         throw new BadRequestError(result.error.message)
