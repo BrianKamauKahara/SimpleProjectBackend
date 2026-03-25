@@ -21,10 +21,11 @@ app.use(cors(corsOptions))
 app.use(connectDB)
 
 // // ---- ROUTES
-app.use('/notes', require('./routes/notesRoutes'))
+import notesRoutes from './routes/notesRoutes'
+app.use('/notes', notesRoutes)
 
 // // ---- ERROR HANDLING
-const errorLogger = require('./middleware/ErrorLogger')
+import errorLogger from './middleware/ErrorLogger'
 app.use(errorLogger)
 
 app.all(/^\/.*/, (req: Request, res: Response) => {

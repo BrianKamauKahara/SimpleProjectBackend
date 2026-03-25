@@ -8,9 +8,10 @@ import { z } from 'zod'
  * Using Zod for runtime validation.
  */
 export const noteSchema = z.object({
-    title: z.string().min(1, { error: 'Title must be a non-empty string' }),
-    content: z.string().min(1, { error: 'Content must be a non-empty string' }),
+    title: z.string().trim().min(1, { error: 'Title must be a non-empty string' }),
+    content: z.string().trim().min(1, { error: 'Content must be a non-empty string' }),
 })
+export type NoteType = z.infer<typeof noteSchema>
 
 
 /**
@@ -24,7 +25,6 @@ export const Note = new FireBaseModel('notes', noteSchema)
  * Helper functions for database operations.
 */
 import { type findAllQueryConfig } from './FireBaseModel'
-type NoteType = z.infer<typeof noteSchema>
 
 // Retrieve all notes with optional query config 
 export const dbGetAllNotes = async (config: findAllQueryConfig) =>

@@ -4,43 +4,11 @@ import {
     dbGetNote,
     dbCreateAndStoreNote,
     dbUpdateNote,
-    dbDeleteNote,
-    noteSchema
+    dbDeleteNote
 } from '../models/Note'
-import { BadRequestError, ValidationError } from '../models/Errors'
-import { z } from 'zod'
-import { findAllQueryParams, type findAllQueryConfig } from "../models/FireBaseModel"
 
-// // --------UTIL
-const parseId = (id: string | string[] | undefined): string | never => {
-    if (Array.isArray(id)) {
-        throw new BadRequestError('Invalid ID format')
-    }
-
-    if (!id || id.trim() === '') throw new BadRequestError('Missing ID')
-
-    return id
-}
-
-const parseNoteData = (body: Record<any, any>): z.infer<typeof noteSchema> | never => {
-    const result = noteSchema.safeParse(body)
-
-    if (!result.success) {
-        throw new ValidationError(result.error.message)
-    }
-
-    return result.data
-}
-
-const parseQuery = (qry: Record<any, any>): findAllQueryConfig | never => {
-    const result = findAllQueryParams.safeParse(qry)
-
-    if (!result.success) {
-        throw new BadRequestError(result.error.message)
-    }
-
-    return result.data
-}
+// // -------- UTIL
+import { parseId, parseNoteData, parseNoteDataPartial, parseQuery } from '../utils/controllerUtils'
 
 // // -------- ROUTES
 
@@ -82,13 +50,12 @@ export const getNote = async (req: Request, res: Response) => {
 // @access Private
 export const updateNote = async (req: Request, res: Response) => {
     const id = parseId(req.params.id)
-    const { title, content } = parseNoteData(req.body)
+    const noteData = parseNoteDataPartial(req.body)
 
-    const updatedNote = await dbUpdateNote(id, { title, content })
+    const updatedNote = await dbUpdateNote(id, noteData)
 
     return res.status(200).json(updatedNote)
 }
-
 
 // @desc Delete Update specified note
 // @route DELETE /:id
@@ -99,12 +66,4 @@ export const deleteNote = async (req: Request, res: Response) => {
     const result = await dbDeleteNote(id)
 
     return res.sendStatus(204)
-}
-
-module.exports = {
-    getAllNotes,
-    getNote,
-    addNote,
-    updateNote,
-    deleteNote
 }
