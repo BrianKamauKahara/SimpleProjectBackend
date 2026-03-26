@@ -5,22 +5,7 @@ import db from '../resources/database'
 import { z, ZodError } from 'zod'
 
 // Useful Types
-type Infer<T extends z.ZodRawShape> = z.infer<z.ZodObject<T>>
-type AtLeastOne<T> = {
-    [K in keyof T]: Pick<T, K>
-}[keyof T] & Partial<T>
-type DocSnapType = admin.firestore.DocumentSnapshot<admin.firestore.DocumentData, admin.firestore.DocumentData>
-type DbDocType<T extends z.ZodRawShape> = Infer<T> & {
-    createdAt: admin.firestore.Timestamp,
-    updatedAt: admin.firestore.Timestamp
-}
-
-export const findAllQueryParams = z.object({
-    startDocId: z.string().trim().optional(),
-    limit: z.coerce.number<number>().optional(),
-    order: z.literal(['asc', 'desc']).optional()
-})
-export type findAllQueryConfig = z.infer<typeof findAllQueryParams>
+import type { DbDocType, DocSnapType, Infer, AtLeastOne, findAllQueryConfig, } from '../types/basemodel.types'
 
 export default class FireBaseModel<T extends z.ZodRawShape> {
     constructor(

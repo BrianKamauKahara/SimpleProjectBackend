@@ -44,5 +44,6 @@
     "moduleDetection": "force",
     "skipLibCheck": true,
   },
-  "include": ["src", "__test__"]
+  "include": ["src"],
+  "exclude": ["__tests__"]
 }

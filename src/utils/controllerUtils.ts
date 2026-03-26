@@ -1,8 +1,15 @@
 import { type Request } from 'express'
 import { BadRequestError, ValidationError } from "../models/Errors"
-import { type findAllQueryConfig, findAllQueryParams } from "../models/FireBaseModel"
+import { type findAllQueryConfig } from "../types/basemodel.types"
 import { noteSchema, type NoteType } from "../models/Note"
+import z from 'zod'
 
+
+export const findAllQueryParams = z.object({
+    startDocId: z.string().trim().optional(),
+    limit: z.coerce.number<number>().optional(),
+    order: z.literal(['asc', 'desc']).optional()
+})
 
 // Util Utils LOL (it's not funny)
 export const stripUndefinedFields = (o: Record<string, any>): Record<string, any> | never => {

@@ -88,8 +88,8 @@ describe('parseNoteDataPartial', () => {
     })
 
     it('requires atleast one field', () => {
-        expect(parseNoteDataPartial({}))
-            .toThrow({})
+        expect(() => parseNoteDataPartial({}))
+            .toThrow(ValidationError)
     })
 
     it('rejects invalid schema input', () => {
