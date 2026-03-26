@@ -16,9 +16,9 @@ import { parseId, parseNoteData, parseNoteDataPartial, parseQuery } from '../uti
 // @route GET /
 // @access Private
 export const getAllNotes = async (req: Request, res: Response) => {
-    const { startDocId, limit, order } = parseQuery(req.query)
+    const qry = parseQuery(req.query)
 
-    const notes = await dbGetAllNotes({ startDocId, limit, order })
+    const notes = await dbGetAllNotes(qry)
 
     return res.status(200).json(notes)
 }

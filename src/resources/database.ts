@@ -1,13 +1,16 @@
 import admin from 'firebase-admin'
 
-const cred = process.env.FIREBASE_CRED
+let db: admin.firestore.Firestore | null
 
-if (!cred) throw new Error('DB credentials missing')
+export const connectDB = (): admin.firestore.Firestore | never => {
+  const cred = process.env.FIREBASE_CRED
 
-admin.initializeApp({
-  credential: admin.credential.cert(JSON.parse(cred))
-})
+  if (!cred) throw new Error('DB credentials missing')
+  admin.initializeApp({
+    credential: admin.credential.cert(JSON.parse(cred))
+  })
 
-const db = admin.firestore()
+  db = admin.firestore()
 
-export default db 
+  return db
+}

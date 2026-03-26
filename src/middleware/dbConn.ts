@@ -1,4 +1,4 @@
-import db from "../resources/database"
+import { connectDB as cDB } from "../resources/database"
 import asyncHandler from "express-async-handler"
 
 import { type Request, type Response, type NextFunction } from 'express'
@@ -9,6 +9,7 @@ const connect = async () => {
   if (firestoreReady) return
 
   try {
+    const db = cDB()
     await db.collection('notes').limit(1).get()
     firestoreReady = true
     console.log('Firestore Ready (cached)')

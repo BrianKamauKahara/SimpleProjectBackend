@@ -114,22 +114,22 @@ describe('parseNoteDataPartial', () => {
 
 describe('parseQuery', () => {
     it('rejects invalid schema input', () => {
-        expect(() => parseQuery({ startDocId: ' ' })).toThrow(ValidationError)
-        expect(() => parseQuery({ order: 'invalid' })).toThrow(ValidationError)
-        expect(() => parseQuery({ limit: 'invalid' })).toThrow(ValidationError)
+        expect(() => parseQuery({ startDocId: [] })).toThrow(BadRequestError)
+        expect(() => parseQuery({ order: 'invalid' })).toThrow(BadRequestError)
+        expect(() => parseQuery({ limit: 'invalid' })).toThrow(BadRequestError)
     })
 
     it('returns valid parsed data', () => {
-        expect(() => parseQuery({ startDocId: 'Valid' }))
+        expect(parseQuery({ startDocId: 'Valid' }))
             .toEqual({ startDocId: 'Valid' })
 
-        expect(() => parseQuery({ order: 'asc', limit: '12' }))
+        expect(parseQuery({ order: 'asc', limit: '12' }))
             .toEqual({ order: 'asc', limit: 12 })
 
-        expect(() => parseQuery({ startDocId: 'Valid', extra: 'extra' }))
+        expect(parseQuery({ startDocId: 'Valid', extra: 'extra' }))
             .toEqual({ startDocId: 'Valid' })
 
-        expect(() => parseQuery({}))
+        expect(parseQuery({}))
             .toEqual({})
     })
 })

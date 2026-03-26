@@ -1,21 +1,44 @@
 import admin from 'firebase-admin'
 
 import { DocumentNotFoundError, BadRequestError, ValidationError } from './Errors'
-import db from '../resources/database'
+import { connectDB } from '../resources/database'
 import { z, ZodError } from 'zod'
 
 // Useful Types
-import type { DbDocType, DocSnapType, Infer, AtLeastOne, findAllQueryConfig, } from '../types/basemodel.types'
+export type Infer<T extends z.ZodRawShape> = z.infer<z.ZodObject<T>>
+
+export type AtLeastOne<T> = {
+    [K in keyof T]: Pick<T, K>
+}[keyof T] & Partial<T>
+
+export type DocSnapType = admin.firestore.DocumentSnapshot<admin.firestore.DocumentData, admin.firestore.DocumentData>
+
+export type DbDocType<T extends z.ZodRawShape> = Infer<T> & {
+    createdAt: admin.firestore.Timestamp,
+    updatedAt: admin.firestore.Timestamp
+}
+
+export type findAllQueryConfig = {
+    startDocId?: string,
+    limit?: number,
+    order?: 'asc' | 'desc'
+}
 
 export default class FireBaseModel<T extends z.ZodRawShape> {
+    protected db: admin.firestore.Firestore | null = null
+
     constructor(
         public collection: string,
         public schema: z.ZodObject<T>,
-    ) { }
+    ) {
+    }
 
     // Helper Properties
     private ref() {
-        return db.collection(this.collection)
+        if (!this.db) {
+            this.db = connectDB()
+        }
+        return this.db.collection(this.collection)
     }
 
     private format(d: DocSnapType) {

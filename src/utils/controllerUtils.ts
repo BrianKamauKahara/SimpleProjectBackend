@@ -1,9 +1,8 @@
 import { type Request } from 'express'
 import { BadRequestError, ValidationError } from "../models/Errors"
-import { type findAllQueryConfig } from "../types/basemodel.types"
+import { type findAllQueryConfig } from "../models/FireBaseModel"
 import { noteSchema, type NoteType } from "../models/Note"
 import z from 'zod'
-
 
 export const findAllQueryParams = z.object({
     startDocId: z.string().trim().optional(),
@@ -73,6 +72,8 @@ export const parseQuery = (qry: Request['query']): findAllQueryConfig | never =>
         throw new BadRequestError(result.error.message)
     }
 
-    return result.data
+    const stripped = stripUndefinedFields(result.data)
+
+    return stripped
 }
 

@@ -20,7 +20,6 @@ export type NoteType = z.infer<typeof noteSchema>
 */
 export const Note = new FireBaseModel('notes', noteSchema)
 
-
 /**
  * Helper functions for database operations.
 */
