@@ -1,7 +1,6 @@
 import admin from 'firebase-admin'
 
 import { DocumentNotFoundError, BadRequestError, ValidationError } from './Errors'
-import { connectDB } from '../resources/database'
 import { z, ZodError } from 'zod'
 
 // Useful Types
@@ -25,30 +24,18 @@ export type findAllQueryConfig = {
 }
 
 export default class FireBaseModel<T extends z.ZodRawShape> {
-    protected db: admin.firestore.Firestore | null = null
-
     constructor(
+        private db: admin.firestore.Firestore,
         public collection: string,
         public schema: z.ZodObject<T>,
     ) {
-        if (!collection || typeof collection !== 'string') {
-            throw new Error('Invalid collection name')
-        }
-
         if (!collection.trim()) {
             throw new Error('Invalid collection: cannot be an empty string')
-        }
-
-        if (!(schema instanceof z.ZodType)) {
-            throw new Error('Invalid schema')
         }
     }
 
     // Helper Properties
     private ref() {
-        if (!this.db) {
-            this.db = connectDB()
-        }
         return this.db.collection(this.collection)
     }
 

@@ -1,6 +1,6 @@
 import FireBaseModel from './FireBaseModel'
 import { z } from 'zod'
-
+import { connectDB } from '../resources/database'
 /**
  * Define the schema for a Note.
  * - title: required non-empty string
@@ -18,7 +18,7 @@ export type NoteType = z.infer<typeof noteSchema>
  * Create a FireBaseModel instance for notes collection.
  * Provides CRUD methods for interacting with Firestore.
 */
-export const Note = new FireBaseModel('notes', noteSchema)
+export const Note = new FireBaseModel(connectDB(), 'notes', noteSchema)
 
 /**
  * Helper functions for database operations.
