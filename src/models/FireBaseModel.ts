@@ -31,6 +31,17 @@ export default class FireBaseModel<T extends z.ZodRawShape> {
         public collection: string,
         public schema: z.ZodObject<T>,
     ) {
+        if (!collection || typeof collection !== 'string') {
+            throw new Error('Invalid collection name')
+        }
+
+        if (!collection.trim()) {
+            throw new Error('Invalid collection: cannot be an empty string')
+        }
+
+        if (!(schema instanceof z.ZodType)) {
+            throw new Error('Invalid schema')
+        }
     }
 
     // Helper Properties
