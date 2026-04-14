@@ -1,5 +1,6 @@
-import { BadRequestError, ValidationError } from "../../models/Errors"
-import { stripUndefinedFields, throwNonObjects, parseId, parseNoteData, parseNoteDataPartial, parseQuery } from "../../utils/controllerUtils"
+import { unknown } from "zod"
+import { BadRequestError, ValidationError } from "../../models/Errors.js"
+import { stripUndefinedFields, throwNonObjects, parseId, parseNoteData, parseNoteDataPartial, parseQuery } from "../../utils/controllerUtils.js"
 
 
 describe('Utils: stripUndefinedFields and throwNonObjects', () => {
@@ -132,6 +133,10 @@ describe('parseQuery', () => {
         expect(parseQuery({}))
             .toEqual({})
     })
+
+    // it('rejects unknown fields', () => {
+    //     expect(() => parseQuery({ unknown: 'any' })).toThrow(BadRequestError)
+    // })
 })
 
 

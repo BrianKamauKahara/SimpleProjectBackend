@@ -1,4 +1,4 @@
-import { connectDB as cDB } from "../resources/database"
+import { connectDB as cDB } from "../resources/database.js"
 import asyncHandler from "express-async-handler"
 
 import { type Request, type Response, type NextFunction } from 'express'

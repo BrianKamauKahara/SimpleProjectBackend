@@ -7,7 +7,7 @@ import {
     addNote,
     updateNote,
     deleteNote
-} from '../controllers/notesController'
+} from '../controllers/notesController.js'
 
 router.route('/')
     .get(getAllNotes)

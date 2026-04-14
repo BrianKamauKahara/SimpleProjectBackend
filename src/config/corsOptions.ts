@@ -1,4 +1,7 @@
-import allowedOrigins from "./allowedOrigins"
+import dotenv from 'dotenv'
+dotenv.config({ quiet: true })
+
+import allowedOrigins from "./allowedOrigins.js"
 import type { CorsOptions } from 'cors'
 
 const allowedEnv = process.env.NODE_ENV === "development" || process.env.NODE_ENV === "production" // ??

@@ -1,7 +1,8 @@
 import admin from 'firebase-admin'
 
-import { DocumentNotFoundError, BadRequestError, ValidationError } from './Errors'
+import { DocumentNotFoundError, BadRequestError, ValidationError } from './Errors.js'
 import { z, ZodError } from 'zod'
+import { stripUndefinedFields } from '../utils/controllerUtils.js'
 
 // Useful Types
 export type Infer<T extends z.ZodRawShape> = z.infer<z.ZodObject<T>>
@@ -29,8 +30,8 @@ export default class FireBaseModel<T extends z.ZodRawShape> {
         public collection: string,
         public schema: z.ZodObject<T>,
     ) {
-        if (!collection.trim()) {
-            throw new Error('Invalid collection: cannot be an empty string')
+        if (!collection || collection.trim() === '') {
+            throw new Error('Invalid collection name')
         }
     }
 
@@ -121,13 +122,15 @@ export default class FireBaseModel<T extends z.ZodRawShape> {
             throw new ValidationError(result.error.message)
         }
 
-        if (!Object.keys(result.data).length) {
+        const stripped = stripUndefinedFields(result.data)
+
+        if (!Object.keys(stripped).length) {
             throw new BadRequestError('No fields to update')
         }
 
         const doc = await this.getDocOrThrow(id)
 
-        await this.updateItem(doc, result.data as AtLeastOne<Infer<T>>) // Interesting
+        await this.updateItem(doc, stripped as AtLeastOne<Infer<T>>) // Interesting
         return this.findById(id)
     }
 

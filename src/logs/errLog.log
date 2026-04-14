@@ -13,3 +13,49 @@
 20260212	09:09:43	MTjH5oBdAETP69Jb3hnq	TypeError:	 Invalid status code: undefined. Status code must be an integer.	GET	undefined	/notes
 20260212	09:15:53	DH49fdh6W9Dv7hC1qktx	TypeError:	 DocumentNotFoundError is not a constructor	PATCH	undefined	/notes/EZ4bVctn8sOa3Ief8HpSg
 20260212	09:52:23	Nf0xEFF8Kj9gpa2TpxPx	Error:	 Update() requires either a single JavaScript object or an alternating list of field/value pairs that can be followed by an optional precondition. Value for argument "dataOrField" is not a valid Firestore value. Cannot use "undefined" as a Firestore value (found in field "content"). If you want to ignore undefined values, enable `ignoreUndefinedProperties`.	PATCH	undefined	/notes/njvlsNtjeTaxKmJIyoEN
+20260414	14:41:42	IPjD3HRPKqngu6eQ9Awj	Error:	 Not allowed by CORS	GET	undefined	/notes?startDocId=P7VRh0KC5aggoXlciUKn&limit=2&asc=false
+20260414	14:44:05	oEzTNbaHB7TAVci1I4w0	DocumentNotFoundError:	 Document with id P7VRh0KC5aggoXlciUKn does not exist	GET	undefined	/notes?startDocId=P7VRh0KC5aggoXlciUKn&limit=2&asc=false
+20260414	14:54:11	HT8dn2lICpZ3YFNdpDSd	BadRequestError:	 [
+  {
+    "code": "invalid_value",
+    "values": [
+      "asc",
+      "desc"
+    ],
+    "path": [
+      "order"
+    ],
+    "message": "Invalid option: expected one of \"asc\"|\"desc\""
+  }
+]	GET	undefined	/notes?startDocId=P7VRh0KC5aggoXlciUKn&limit=2&order=%27bad%27
+20260414	14:55:06	4YFVcGNK3xFtH4M7i6lj	BadRequestError:	 [
+  {
+    "code": "invalid_value",
+    "values": [
+      "asc",
+      "desc"
+    ],
+    "path": [
+      "order"
+    ],
+    "message": "Invalid option: expected one of \"asc\"|\"desc\""
+  }
+]	GET	undefined	/notes?startDocId=P7VRh0KC5aggoXlciUKn&limit=2&order=%27asc%27
+20260414	14:55:44	cPVGYdafPRGDjqSQh0jl	BadRequestError:	 [
+  {
+    "code": "invalid_value",
+    "values": [
+      "asc",
+      "desc"
+    ],
+    "path": [
+      "order"
+    ],
+    "message": "Invalid option: expected one of \"asc\"|\"desc\""
+  }
+]	GET	undefined	/notes?startDocId=P7VRh0KC5aggoXlciUKn&limit=2&order=%27asc%27
+20260414	14:55:48	rNLNSRau9qaN44XBJIH2	DocumentNotFoundError:	 Document with id P7VRh0KC5aggoXlciUKn does not exist	GET	undefined	/notes?startDocId=P7VRh0KC5aggoXlciUKn&limit=2&order=asc
+20260414	15:02:24	hqvhvf1sTWz4naXZ6ZBV	DocumentNotFoundError:	 Document with id AkBkCJbEevonNa1l19S does not exist	GET	undefined	/notes/AkBkCJbEevonNa1l19S
+20260414	15:08:19	jimGlflqlCVrzDOlJfx9	Error:	 Update() requires either a single JavaScript object or an alternating list of field/value pairs that can be followed by an optional precondition. Value for argument "dataOrField" is not a valid Firestore value. Cannot use "undefined" as a Firestore value (found in field "content"). If you want to ignore undefined values, enable `ignoreUndefinedProperties`.	PATCH	undefined	/notes/AkBkCJbEevonNa1l19VS
+20260414	15:14:38	bcBrVxzGpLqi1rweyLwV	Error:	 Update() requires either a single JavaScript object or an alternating list of field/value pairs that can be followed by an optional precondition. Value for argument "dataOrField" is not a valid Firestore value. Cannot use "undefined" as a Firestore value (found in field "content"). If you want to ignore undefined values, enable `ignoreUndefinedProperties`.	PATCH	undefined	/notes/AkBkCJbEevonNa1l19VS
+20260414	15:19:40	jnR2ztQjFaldWXJnZ4ck	DocumentNotFoundError:	 Document with id E3vvma9lAtfR5jXrmI0s does not exist	DELETE	undefined	/notes/E3vvma9lAtfR5jXrmI0s

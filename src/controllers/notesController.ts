@@ -5,10 +5,10 @@ import {
     dbCreateAndStoreNote,
     dbUpdateNote,
     dbDeleteNote
-} from '../models/Note'
+} from '../models/Note.js'
 
 // // -------- UTIL
-import { parseId, parseNoteData, parseNoteDataPartial, parseQuery } from '../utils/controllerUtils'
+import { parseId, parseNoteData, parseNoteDataPartial, parseQuery } from '../utils/controllerUtils.js'
 
 // // -------- ROUTES
 

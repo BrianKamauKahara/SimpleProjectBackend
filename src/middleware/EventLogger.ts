@@ -1,4 +1,5 @@
 import path from "path"
+import { fileURLToPath } from "url"
 import fs, { promises as fsPromises } from "fs"
 
 import { type Request, type Response, type NextFunction } from "express"
@@ -6,23 +7,22 @@ import { format } from "date-fns"
 
 const getLogMessage = (message: string) => `${format(new Date(), 'yyyyMMdd\tHH:mm:ss')}\t${generateId(20)}\t${message}`
 
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
 export const logEvents = async (message: string, fileName: string) => {
     if (process.env.NODE_ENV !== "development") return
 
     const logItem = getLogMessage(message)
 
-    const logsFolder = path.join('..', 'logs')
-    const logFile = path.join('..', 'logs', fileName)
-    try {
-        if (!fs.existsSync(logsFolder)) {
-            throw new Error('Please provide a path to store logs')
-        }
+    const logsFolder = path.join(__dirname, '..', 'logs')
+    const logFile = path.join(logsFolder, fileName)
 
-        await fsPromises.appendFile(logFile, logItem)
-    } catch (err) {
-        console.error(err)
+    if (!fs.existsSync(logsFolder)) {
+        throw new Error('Please provide a path to store logs')
     }
 
+    await fsPromises.appendFile(logFile, logItem)
 }
 
 export const logger = (req: Request, res: Response, next: NextFunction) => {

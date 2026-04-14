@@ -1,6 +1,6 @@
-const { logEvents } = require('./EventLogger')
+import { logEvents } from './EventLogger.js'
 import { type Request, type Response, type NextFunction } from 'express'
-import { AppError } from '../models/Errors'
+import { AppError } from '../models/Errors.js'
 
 const errorLogger = (err: Error | AppError, req: Request, res: Response, next: NextFunction) => {
     logEvents(`${err.name}:\t ${err.message}\t${req.method}\t${req.headers.origin}\t${req.url}\n`, 'errLog.log')

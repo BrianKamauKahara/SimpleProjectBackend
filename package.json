@@ -1,12 +1,12 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "So I wanan revive my JS and coding skills or whatever",
+  "description": "Notes Application backend",
   "main": "dist/server.js",
   "scripts": {
     "test": "jest",
     "start": "node dist/server.js",
-    "dev": "nodemon",
+    "dev": "tsx watch src/server.ts",
     "build": "tsc"
   },
   "keywords": [],
@@ -21,6 +21,7 @@
     "express": "^5.2.1",
     "express-async-handler": "^1.2.0",
     "firebase-admin": "^13.6.0",
+    "tsx": "^4.21.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
@@ -32,7 +33,6 @@
     "jest": "^30.3.0",
     "nodemon": "^3.1.11",
     "ts-jest": "^29.4.6",
-    "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }
 }

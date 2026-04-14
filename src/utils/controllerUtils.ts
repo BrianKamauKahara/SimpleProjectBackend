@@ -1,7 +1,7 @@
 import { type Request } from 'express'
-import { BadRequestError, ValidationError } from "../models/Errors"
-import { type findAllQueryConfig } from "../models/FireBaseModel"
-import { noteSchema, type NoteType } from "../models/Note"
+import { BadRequestError, ValidationError } from "../models/Errors.js"
+import { type findAllQueryConfig } from "../models/FireBaseModel.js"
+import { noteSchema, type NoteType } from "../models/Note.js"
 import z from 'zod'
 
 export const findAllQueryParams = z.object({
