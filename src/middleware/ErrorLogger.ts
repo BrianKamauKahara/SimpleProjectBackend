@@ -7,9 +7,19 @@ const errorLogger = (err: Error | AppError, req: Request, res: Response, next: N
 
     process.env.NODE_ENV === 'development' && console.error(err.stack)
 
-    return res
-        .status(err instanceof AppError ? err.statusCode : 500)
-        .json(process.env.NODE_ENV === 'development' ? err.stack : { message: 'Internal Server Error' })
+    const errorCode = err instanceof AppError ? err.statusCode : 500
+    const errorMessage = process.env.NODE_ENV === 'development'
+        ? err.message
+        : { message: 'Internal Server Error' }
+    const errorInstance = err instanceof AppError ? err.name : 'InternalServerError'
+
+    const errorBody = {
+        name: errorInstance,
+        message: errorMessage,
+        statusCode: errorCode,
+    }
+
+    return res.status(errorCode).json(errorBody)
 }
 
 

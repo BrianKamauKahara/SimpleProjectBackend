@@ -15,7 +15,7 @@ export const logEvents = async (message: string, fileName: string) => {
 
     const logItem = getLogMessage(message)
 
-    const logsFolder = path.join(__dirname, '..', 'logs')
+    const logsFolder = path.join(__dirname, '../..', 'logs')
     const logFile = path.join(logsFolder, fileName)
 
     if (!fs.existsSync(logsFolder)) {
