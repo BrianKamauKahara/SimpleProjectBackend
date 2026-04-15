@@ -4,6 +4,10 @@ A RESTful backend for managing notes using Node.js, Express, and Firestore
 
 This project also serves as a base for easy setup of other backend projects
 
+You can access the live application here:
+
+https://notes-react-app-seven.vercel.app/
+
 ---
 
 ## Table of Contents
